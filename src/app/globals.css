@@ -15,6 +15,20 @@
     --border: #e2e8f0;
     --accent: #eef2ff;
     --accent-foreground: #4338ca;
+
+    /* Category Accents - Light */
+    --kotoba: #6366f1;
+    --kotoba-bg: rgba(99, 102, 241, 0.08);
+    --bunpou: #d97706;
+    --bunpou-bg: rgba(217, 119, 6, 0.08);
+    --dokkai: #059669;
+    --dokkai-bg: rgba(5, 150, 105, 0.08);
+
+    /* Sidebar metrics */
+    --sidebar-width-expanded: 260px;
+    --sidebar-width-collapsed: 76px;
+    --topbar-height: 64px;
+    --bottom-nav-height: 68px;
   }
 
   .dark {
@@ -29,6 +43,14 @@
     --border: rgba(255, 255, 255, 0.1);
     --accent: rgba(99, 102, 241, 0.15);
     --accent-foreground: #c7d2fe;
+
+    /* Category Accents - Dark */
+    --kotoba: #818cf8;
+    --kotoba-bg: rgba(99, 102, 241, 0.15);
+    --bunpou: #fbbf24;
+    --bunpou-bg: rgba(245, 158, 11, 0.15);
+    --dokkai: #34d399;
+    --dokkai-bg: rgba(16, 185, 129, 0.15);
   }
 
   * {
@@ -44,10 +66,12 @@
   /* Japanese Typography Helper */
   .font-japanese {
     font-family: var(--font-japanese), sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
   }
 }
 
-/* Custom Glassmorphism Styles */
+/* Glassmorphism Design Tokens */
 .glass-panel {
   background: var(--card);
   backdrop-filter: blur(16px);
@@ -55,10 +79,83 @@
   border: 1px solid var(--card-border);
 }
 
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-interactive {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.glass-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.25);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animation Keyframes & Classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {

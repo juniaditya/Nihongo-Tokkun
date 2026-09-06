@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        app: '900px',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
         heading: ['var(--font-heading)', 'sans-serif'],
