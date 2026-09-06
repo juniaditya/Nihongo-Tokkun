@@ -130,7 +130,7 @@ export default function HomePage() {
                 Sesi Per Tipe Soal
               </h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Tiap question_type dilatih terpisah dengan syarat kelulusan $\ge 90\%$ per unit.
+                Tiap question_type dilatih terpisah dengan syarat kelulusan &ge; 90% per unit.
               </p>
             </div>
 

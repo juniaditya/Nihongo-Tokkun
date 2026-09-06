@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Inter, Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers';
-import { Header } from '@/components/layout/header';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -50,11 +49,8 @@ export default function RootLayout({
       className={`dark ${plusJakartaSans.variable} ${inter.variable} ${notoSansJP.variable}`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-screen flex-col font-sans">
-        <ThemeProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-        </ThemeProvider>
+      <body className="min-h-screen bg-background font-sans antialiased text-foreground">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
