@@ -36,15 +36,20 @@ const CATEGORY_CONFIG: Record<
 
 function questionTypeLabel(type: string): string {
   const labels: Record<string, string> = {
+    arti: '意味 · Arti Kata',
+    cara_baca: '読み方 · Cara Baca Kanji',
+    penggunaan_kalimat: '用法 · Penggunaan Kalimat',
+    cara_pakai: '文脈規定 · Cara Pakai',
+    sinonim: '類義語 · Sinonim',
+    grammar_choice: '文法形式 · Pilihan Grammar',
+    fill_in: '穴埋め · Isi Kosong',
+    ordering: '文の組み立て · Urutan Kalimat',
+    comprehension: '文章読解 · Pemahaman',
     meaning: '意味 · Arti',
     reading: '読み方 · Bacaan',
     usage: '用法 · Penggunaan',
     context: '文脈 · Konteks',
     synonym: '類義語 · Sinonim',
-    grammar_choice: '文法選択 · Pilihan Grammar',
-    fill_in: '穴埋め · Isi Kosong',
-    ordering: '並べ替え · Urutan',
-    comprehension: '読解 · Pemahaman',
   };
   return labels[type] ?? type;
 }
@@ -235,21 +240,29 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 {questionTypes.map((type) => (
                   <div
                     key={type}
-                    className="flex items-center gap-4 rounded-xl border border-white/8 bg-white/4 p-4"
-                    title="Latihan akan diaktifkan pada tahap berikutnya"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md hover:border-primary-500/40 hover:bg-white/8 transition-all group"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-500/15">
-                      <PlayCircle className="h-5 w-5 text-primary-400" />
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500/20 to-secondary-500/20 border border-primary-500/30 text-primary-400 group-hover:scale-105 transition-transform">
+                        <PlayCircle className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground text-sm truncate">
+                          {questionTypeLabel(type)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Mode latihan 4 pilihan
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
-                        {questionTypeLabel(type)}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                        <Construction className="h-3 w-3" />
-                        Latihan akan diaktifkan pada tahap berikutnya
-                      </p>
-                    </div>
+
+                    <Link
+                      href={`/practice/${catalogLesson.id}/${encodeURIComponent(type)}`}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-500 to-secondary-500 px-4 py-2 text-xs font-semibold text-white shadow-glow hover:opacity-90 transition-opacity shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    >
+                      <span>Mulai Latihan</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
                   </div>
                 ))}
               </div>
