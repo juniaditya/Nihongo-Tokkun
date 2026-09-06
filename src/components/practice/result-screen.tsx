@@ -2,6 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Trophy, XCircle, RotateCcw, ArrowLeft, CheckCircle, Target, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { ProgressRing } from '@/components/ui/progress-ring';
+import type { Database } from '@/types/database.types';
+
+export interface PracticeProgressDetails {
+  type: Pick<Database['public']['Tables']['lesson_type_progress']['Row'], 'best_score' | 'attempts_count' | 'passed'> | null;
+  lesson: Pick<Database['public']['Tables']['lesson_progress']['Row'], 'status' | 'completed_at'> | null;
+}
 
 interface ResultScreenProps {
   lessonId: string;
@@ -16,6 +22,9 @@ interface ResultScreenProps {
   totalQuestions: number;
   onRetry: () => void;
   isRetrying: boolean;
+  progress: PracticeProgressDetails | null;
+  progressError: string | null;
+  isProgressLoading: boolean;
 }
 
 export function ResultScreen({
@@ -31,6 +40,9 @@ export function ResultScreen({
   totalQuestions,
   onRetry,
   isRetrying,
+  progress,
+  progressError,
+  isProgressLoading,
 }: ResultScreenProps) {
   const roundedScore = Math.round(score);
 
@@ -139,6 +151,20 @@ export function ResultScreen({
             </p>
           </div>
         </div>
+
+        <section aria-label="Detail progres" className="space-y-3 text-left" aria-busy={isProgressLoading}>
+          <h3 className="font-semibold text-foreground">Progres Lesson</h3>
+          {isProgressLoading && <p role="status" className="text-sm text-muted-foreground">Memuat detail progres...</p>}
+          {progressError && <p role="alert" className="text-sm text-foreground">{progressError} Hasil sesi tetap tersedia.</p>}
+          {progress && (
+            <dl className="grid grid-cols-2 gap-3 text-sm">
+              <div><dt className="text-muted-foreground">Skor Terbaik</dt><dd>{progress.type?.best_score != null ? `${progress.type.best_score}%` : 'Belum tersedia'}</dd></div>
+              <div><dt className="text-muted-foreground">Jumlah Percobaan</dt><dd>{progress.type?.attempts_count ?? 'Belum tersedia'}</dd></div>
+              <div><dt className="text-muted-foreground">Status Tipe Saat Ini</dt><dd>{progress.type ? (progress.type.passed ? 'Lulus' : 'Belum lulus') : 'Belum tersedia'}</dd></div>
+              <div><dt className="text-muted-foreground">Status Lesson</dt><dd>{progress.lesson ? ({ not_started: 'Belum dimulai', in_progress: 'Sedang dipelajari', completed: 'Selesai' }[progress.lesson.status]) : 'Belum tersedia'}</dd></div>
+            </dl>
+          )}
+        </section>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-2">

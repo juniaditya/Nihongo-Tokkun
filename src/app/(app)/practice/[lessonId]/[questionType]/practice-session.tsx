@@ -7,7 +7,7 @@ import { PracticeHeader } from '@/components/practice/practice-header';
 import { QuestionCard } from '@/components/practice/question-card';
 import { OptionCard } from '@/components/practice/option-card';
 import { FeedbackPanel } from '@/components/practice/feedback-panel';
-import { ResultScreen } from '@/components/practice/result-screen';
+import { ResultScreen, type PracticeProgressDetails } from '@/components/practice/result-screen';
 import { DokkaiReader, type DokkaiPassage } from '@/components/practice/dokkai-reader';
 import type { MistakePreset } from '@/components/practice/mistake-logger';
 import { Button } from '@/components/ui/button';
@@ -108,6 +108,34 @@ export function PracticeSession({
   const [resultState, setResultState] = useState<ResultState | null>(null);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [progress, setProgress] = useState<PracticeProgressDetails | null>(null);
+  const [progressError, setProgressError] = useState<string | null>(null);
+  const [isProgressLoading, setIsProgressLoading] = useState(false);
+  const progressRequestRef = useRef(0);
+
+  const loadProgress = useCallback(async () => {
+    const request = ++progressRequestRef.current;
+    setIsProgressLoading(true);
+    setProgressError(null);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error('Sesi pengguna tidak tersedia.');
+      const [typeResult, lessonResult] = await Promise.all([
+        supabase.from('lesson_type_progress').select('best_score, attempts_count, passed')
+          .eq('user_id', user.id).eq('lesson_id', lessonId).eq('question_type', questionType).maybeSingle(),
+        supabase.from('lesson_progress').select('status, completed_at')
+          .eq('user_id', user.id).eq('lesson_id', lessonId).maybeSingle(),
+      ]);
+      if (request !== progressRequestRef.current) return;
+      setProgress({ type: typeResult.data, lesson: lessonResult.data });
+      if (typeResult.error || lessonResult.error) throw new Error(typeResult.error?.message || lessonResult.error?.message);
+    } catch (error: unknown) {
+      console.error('[PracticeSession] progress error:', error);
+      if (request === progressRequestRef.current) setProgressError('Detail progres gagal dimuat.');
+    } finally {
+      if (request === progressRequestRef.current) setIsProgressLoading(false);
+    }
+  }, [supabase, lessonId, questionType]);
 
   // Question Interaction Timer
   const questionStartTimeRef = useRef<number>(Date.now());
@@ -128,6 +156,7 @@ export function PracticeSession({
 
         const payload = finData as unknown as ResultState;
         setResultState(payload);
+        void loadProgress();
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Gagal menyelesaikan sesi latihan.';
         console.error('[PracticeSession] finalize error:', message);
@@ -136,7 +165,7 @@ export function PracticeSession({
         setIsFinalizing(false);
       }
     },
-    [supabase]
+    [supabase, loadProgress]
   );
 
   // Initialize or resume practice session
@@ -150,6 +179,17 @@ export function PracticeSession({
       setAnsweredMap(new Map());
       setQuestions([]);
       setPassageMap(new Map());
+      setCurrentIndex(0);
+      setSessionId(null);
+      setStartedAt(null);
+      setTimeLimitSeconds(null);
+      setSubmitError(null);
+      setIsSubmitting(false);
+      setProgress(null);
+      setProgressError(null);
+      setIsProgressLoading(false);
+      progressRequestRef.current += 1;
+      questionStartTimeRef.current = Date.now();
 
       // 1. Call start_practice_session RPC
       const { data: startData, error: startErr } = await (supabase.rpc as any)(
@@ -179,11 +219,15 @@ export function PracticeSession({
         .eq('question_type', questionType)
         .order('sort_order', { ascending: true });
 
-      if (qErr || !rawQuestions || rawQuestions.length === 0) {
+      if (qErr || !rawQuestions) {
         throw new Error(qErr?.message || 'Tidak ada soal aktif untuk tipe latihan ini.');
       }
 
       const questionsData = rawQuestions as SafeQuestionRow[];
+      if (questionsData.length !== startPayload.total_questions) {
+        throw new Error('Materi latihan berubah sejak sesi ini dimulai.');
+      }
+      if (questionsData.length === 0) throw new Error('Tidak ada soal aktif untuk tipe latihan ini.');
       const questionIds = questionsData.map((q) => q.id);
 
       // 3. Fetch options from safe view: v_practice_question_options
@@ -455,6 +499,9 @@ export function PracticeSession({
         totalQuestions={resultState.total_questions}
         onRetry={handleRetrySession}
         isRetrying={isRetrying}
+        progress={progress}
+        progressError={progressError}
+        isProgressLoading={isProgressLoading}
       />
     );
   }
@@ -485,6 +532,7 @@ export function PracticeSession({
       />
 
       {/* Question Card */}
+      {currentPassage && <DokkaiReader key={currentPassage.id} passage={currentPassage} />}
       <QuestionCard
         questionNumber={currentIndex + 1}
         questionText={currentQuestion.question_text}
