@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { Container } from '@/components/layout/container';
 
@@ -12,6 +13,10 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
 
   let username = 'Pengguna';
   if (user) {

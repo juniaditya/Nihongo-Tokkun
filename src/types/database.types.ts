@@ -733,6 +733,18 @@ export interface Database {
       };
     };
     Views: {
+      v_public_lesson_catalog: {
+        Row: {
+          id: string;
+          course_id: string;
+          category: 'kotoba' | 'bunpou' | 'dokkai';
+          number: number;
+          title: string | null;
+          is_guest_accessible: boolean;
+          time_limit_seconds: number | null;
+          sort_order: number;
+        };
+      };
       v_user_global_stats: {
         Row: {
           user_id: string;
