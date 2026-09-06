@@ -8,11 +8,8 @@
 -- Safety:    Non-destructive. Creates/replaces a VIEW only.
 --            Does NOT alter any table, existing RLS policy, or existing
 --            grant on any base table.
--- Idempotent: Yes (DROP VIEW IF EXISTS + CREATE OR REPLACE VIEW).
+-- Idempotent: Yes (CREATE OR REPLACE VIEW — no DROP required).
 -- =====================================================================
-
--- Drop existing view if it exists from a previous attempt (idempotent)
-drop view if exists public.v_public_lesson_catalog;
 
 -- =====================================================================
 -- The view projects ONLY catalog metadata. It deliberately excludes:
@@ -47,7 +44,7 @@ where l.is_active = true;
 -- Grants: SELECT only, to anon and authenticated.
 -- Revoke any prior grants first to ensure a clean state.
 -- =====================================================================
-revoke all on public.v_public_lesson_catalog from anon, authenticated;
+revoke all privileges on public.v_public_lesson_catalog from public, anon, authenticated;
 grant select on public.v_public_lesson_catalog to anon;
 grant select on public.v_public_lesson_catalog to authenticated;
 
