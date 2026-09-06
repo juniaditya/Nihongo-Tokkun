@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Nihongo Tokkun</title>
+    <meta name="description" content="Your personal Japanese learning dashboard. Track your progress, streaks, and leaderboard standing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="app-body">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🇯🇵</span>
+                Nihongo Tokkun
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-label">Main</span>
+                <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-kotoba">
+                    <span class="nav-icon">📖</span>
+                    <span>Kotoba</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-bunpou">
+                    <span class="nav-icon">📚</span>
+                    <span>Bunpou</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-search">
+                    <span class="nav-icon">🔍</span>
+                    <span>Search</span>
+                </a>
+            </div>
+            <div class="nav-section">
+                <span class="nav-section-label">My Learning</span>
+                <a href="#" class="nav-item" id="nav-flashcards">
+                    <span class="nav-icon">🗂️</span>
+                    <span>Flashcards</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-vocab">
+                    <span class="nav-icon">📝</span>
+                    <span>My Vocab Notes</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-leaderboard">
+                    <span class="nav-icon">🏆</span>
+                    <span>Leaderboard</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-avatar-mini">
+                <div class="avatar-circle">渡</div>
+                <div class="user-info-mini">
+                    <span class="user-name-mini">Watanabe</span>
+                    <span class="user-role-mini">Student · Group A</span>
+                </div>
+            </div>
+            <a href="index.html" class="btn btn-outline btn-sm">Log Out</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div>
+                    <h1 class="topbar-title">Dashboard</h1>
+                    <p class="topbar-subtitle">おはようございます, Watanabe! 今日も頑張って。</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+                    🔔
+                    <span class="notif-badge">2</span>
+                </button>
+                <div class="user-avatar">
+                    <div class="avatar-circle">渡</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- Stat Cards Row -->
+            <section class="stats-row" aria-label="Progress Summary">
+                <div class="stat-card glass-card fade-in">
+                    <div class="stat-card-icon" style="background: rgba(99,102,241,0.15); color: #818cf8;">🎯</div>
+                    <div class="stat-card-body">
+                        <p class="stat-card-label">Materials Completed</p>
+                        <h2 class="stat-card-value">12 <span class="stat-card-unit">/ 20</span></h2>
+                        <div class="mini-progress">
+                            <div class="mini-progress-bar" style="width: 60%; background: var(--primary-color);"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card glass-card fade-in delay-1">
+                    <div class="stat-card-icon" style="background: rgba(16,185,129,0.15); color: #34d399;">🔥</div>
+                    <div class="stat-card-body">
+                        <p class="stat-card-label">Current Streak</p>
+                        <h2 class="stat-card-value">7 <span class="stat-card-unit">days</span></h2>
+                        <p class="stat-card-meta">Best: 14 days</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card fade-in delay-2">
+                    <div class="stat-card-icon" style="background: rgba(236,72,153,0.15); color: #f472b6;">⚡</div>
+                    <div class="stat-card-body">
+                        <p class="stat-card-label">Difficult Items</p>
+                        <h2 class="stat-card-value">8 <span class="stat-card-unit">items</span></h2>
+                        <p class="stat-card-meta">Needs review</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card fade-in delay-3">
+                    <div class="stat-card-icon" style="background: rgba(245,158,11,0.15); color: #fbbf24;">🏅</div>
+                    <div class="stat-card-body">
+                        <p class="stat-card-label">Leaderboard Rank</p>
+                        <h2 class="stat-card-value">#3 <span class="stat-card-unit">/ 15</span></h2>
+                        <p class="stat-card-meta">↑ 2 since last week</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Grid -->
+            <div class="dashboard-grid">
+
+                <!-- Left Column -->
+                <div class="col-left">
+
+                    <!-- Continue Learning -->
+                    <section class="section-card glass-card fade-in">
+                        <div class="section-card-header">
+                            <h2>Continue Learning</h2>
+                            <a href="#" class="link-sm">View all →</a>
+                        </div>
+                        <div class="lesson-list">
+                            <div class="lesson-item" id="lesson-kotoba-5">
+                                <div class="lesson-icon kotoba">こ</div>
+                                <div class="lesson-info">
+                                    <p class="lesson-name">5 Kotoba — Cara Baca</p>
+                                    <div class="lesson-progress-bar">
+                                        <div class="lesson-progress-fill" style="width: 60%;"></div>
+                                    </div>
+                                </div>
+                                <span class="lesson-score">60%</span>
+                                <button class="btn btn-primary btn-sm" id="resume-kotoba-5">Resume</button>
+                            </div>
+                            <div class="lesson-item" id="lesson-bunpou-3">
+                                <div class="lesson-icon bunpou">文</div>
+                                <div class="lesson-info">
+                                    <p class="lesson-name">3 Bunpou — Arti & Fungsi</p>
+                                    <div class="lesson-progress-bar">
+                                        <div class="lesson-progress-fill" style="width: 80%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+                                <span class="lesson-score">80%</span>
+                                <button class="btn btn-primary btn-sm" id="resume-bunpou-3">Resume</button>
+                            </div>
+                            <div class="lesson-item untried" id="lesson-kotoba-6">
+                                <div class="lesson-icon kotoba">こ</div>
+                                <div class="lesson-info">
+                                    <p class="lesson-name">6 Kotoba — Arti</p>
+                                    <p class="lesson-sub">Not started yet</p>
+                                </div>
+                                <span class="lesson-score muted">—</span>
+                                <button class="btn btn-outline btn-sm" id="start-kotoba-6">Start</button>
+                            </div>
+                            <div class="lesson-item untried" id="lesson-bunpou-4">
+                                <div class="lesson-icon bunpou">文</div>
+                                <div class="lesson-info">
+                                    <p class="lesson-name">4 Bunpou — Bentuk & Koneksi</p>
+                                    <p class="lesson-sub">Not started yet</p>
+                                </div>
+                                <span class="lesson-score muted">—</span>
+                                <button class="btn btn-outline btn-sm" id="start-bunpou-4">Start</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Score Overview per Subbab -->
+                    <section class="section-card glass-card fade-in">
+                        <div class="section-card-header">
+                            <h2>Avg. Score by Sub-section</h2>
+                            <div class="tab-toggle">
+                                <button class="tab-btn active" id="tab-kotoba">Kotoba</button>
+                                <button class="tab-btn" id="tab-bunpou">Bunpou</button>
+                            </div>
+                        </div>
+                        <div class="score-chart" id="kotoba-scores">
+                            <div class="score-row">
+                                <span class="score-label">Arti</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 85%;">85%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Cara Baca</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 60%; background: var(--secondary-color);">60%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Penggunaan dalam Kalimat</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 72%;">72%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">用法</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 50%; background: #f59e0b;">50%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">類義語・使い分け</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 68%;">68%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Latihan / Flashcard</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 78%;">78%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="score-chart hidden" id="bunpou-scores">
+                            <div class="score-row">
+                                <span class="score-label">Arti & Fungsi</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 90%;">90%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Bentuk & Koneksi</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 55%; background: var(--secondary-color);">55%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Perbedaan Grammar Mirip</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 45%; background: #f59e0b;">45%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Penggunaan dalam Kalimat</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 80%;">80%</div>
+                                </div>
+                            </div>
+                            <div class="score-row">
+                                <span class="score-label">Latihan / Flashcard</span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill" style="width: 73%;">73%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div><!-- end col-left -->
+
+                <!-- Right Column -->
+                <div class="col-right">
+
+                    <!-- Difficult Items -->
+                    <section class="section-card glass-card fade-in delay-1">
+                        <div class="section-card-header">
+                            <h2>⚡ Difficult Items</h2>
+                            <span class="tag-badge">Needs Review</span>
+                        </div>
+                        <div class="difficult-list">
+                            <div class="difficult-item" id="diff-1">
+                                <div class="diff-info">
+                                    <p class="diff-word">環境 (かんきょう)</p>
+                                    <p class="diff-meta">Kotoba 4 · Cara Baca</p>
+                                </div>
+                                <div class="diff-stats">
+                                    <span class="diff-percent danger">68% wrong</span>
+                                </div>
+                            </div>
+                            <div class="difficult-item" id="diff-2">
+                                <div class="diff-info">
+                                    <p class="diff-word">〜に対して</p>
+                                    <p class="diff-meta">Bunpou 3 · Perbedaan Grammar</p>
+                                </div>
+                                <div class="diff-stats">
+                                    <span class="diff-percent danger">72% wrong</span>
+                                </div>
+                            </div>
+                            <div class="difficult-item" id="diff-3">
+                                <div class="diff-info">
+                                    <p class="diff-word">雰囲気 (ふんいき)</p>
+                                    <p class="diff-meta">Kotoba 5 · Cara Baca</p>
+                                </div>
+                                <div class="diff-stats">
+                                    <span class="diff-percent warning">55% wrong</span>
+                                </div>
+                            </div>
+                            <div class="difficult-item" id="diff-4">
+                                <div class="diff-info">
+                                    <p class="diff-word">〜にしたがって</p>
+                                    <p class="diff-meta">Bunpou 2 · Bentuk & Koneksi</p>
+                                </div>
+                                <div class="diff-stats">
+                                    <span class="diff-percent warning">58% wrong</span>
+                                </div>
+                            </div>
+                            <div class="difficult-item" id="diff-5">
+                                <div class="diff-info">
+                                    <p class="diff-word">微妙 (びみょう)</p>
+                                    <p class="diff-meta">Kotoba 3 · 用法</p>
+                                </div>
+                                <div class="diff-stats">
+                                    <span class="diff-percent warning">53% wrong</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Recent Sessions -->
+                    <section class="section-card glass-card fade-in delay-2">
+                        <div class="section-card-header">
+                            <h2>Recent Sessions</h2>
+                        </div>
+                        <div class="sessions-list">
+                            <div class="session-item" id="session-1">
+                                <div class="session-icon quiz">Q</div>
+                                <div class="session-info">
+                                    <p class="session-name">Kotoba 4 — Arti</p>
+                                    <p class="session-date">Today · 09:15</p>
+                                </div>
+                                <span class="session-score score-high">85%</span>
+                            </div>
+                            <div class="session-item" id="session-2">
+                                <div class="session-icon flash">F</div>
+                                <div class="session-info">
+                                    <p class="session-name">Bunpou 3 — Latihan Flashcard</p>
+                                    <p class="session-date">Yesterday · 21:42</p>
+                                </div>
+                                <span class="session-score score-mid">73%</span>
+                            </div>
+                            <div class="session-item" id="session-3">
+                                <div class="session-icon quiz">Q</div>
+                                <div class="session-info">
+                                    <p class="session-name">Kotoba 3 — 用法</p>
+                                    <p class="session-date">2 days ago · 19:30</p>
+                                </div>
+                                <span class="session-score score-low">50%</span>
+                            </div>
+                            <div class="session-item" id="session-4">
+                                <div class="session-icon flash">F</div>
+                                <div class="session-info">
+                                    <p class="session-name">Kotoba 2 — Latihan Flashcard</p>
+                                    <p class="session-date">3 days ago · 08:00</p>
+                                </div>
+                                <span class="session-score score-high">91%</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Leaderboard -->
+                    <section class="section-card glass-card fade-in delay-3">
+                        <div class="section-card-header">
+                            <h2>🏆 Leaderboard</h2>
+                            <span class="link-sm">Group A</span>
+                        </div>
+                        <div class="leaderboard-list">
+                            <div class="lb-item" id="lb-1">
+                                <span class="lb-rank rank-gold">1</span>
+                                <div class="lb-avatar" style="background: rgba(251,191,36,0.15); color: #fbbf24;">紀</div>
+                                <div class="lb-info">
+                                    <p class="lb-name">Kitagawa</p>
+                                    <p class="lb-meta">15 completed · 🔥 21 days</p>
+                                </div>
+                                <span class="lb-score">96%</span>
+                            </div>
+                            <div class="lb-item" id="lb-2">
+                                <span class="lb-rank rank-silver">2</span>
+                                <div class="lb-avatar" style="background: rgba(148,163,184,0.15); color: #94a3b8;">高</div>
+                                <div class="lb-info">
+                                    <p class="lb-name">Takahashi</p>
+                                    <p class="lb-meta">14 completed · 🔥 14 days</p>
+                                </div>
+                                <span class="lb-score">88%</span>
+                            </div>
+                            <div class="lb-item lb-you" id="lb-3">
+                                <span class="lb-rank rank-bronze">3</span>
+                                <div class="lb-avatar" style="background: rgba(99,102,241,0.2); color: #818cf8;">渡</div>
+                                <div class="lb-info">
+                                    <p class="lb-name">Watanabe <span class="you-badge">You</span></p>
+                                    <p class="lb-meta">12 completed · 🔥 7 days</p>
+                                </div>
+                                <span class="lb-score">82%</span>
+                            </div>
+                            <div class="lb-item" id="lb-4">
+                                <span class="lb-rank">4</span>
+                                <div class="lb-avatar" style="background: rgba(255,255,255,0.05); color: #64748b;">田</div>
+                                <div class="lb-info">
+                                    <p class="lb-name">Tanaka</p>
+                                    <p class="lb-meta">10 completed · 🔥 5 days</p>
+                                </div>
+                                <span class="lb-score">75%</span>
+                            </div>
+                            <div class="lb-item" id="lb-5">
+                                <span class="lb-rank">5</span>
+                                <div class="lb-avatar" style="background: rgba(255,255,255,0.05); color: #64748b;">山</div>
+                                <div class="lb-info">
+                                    <p class="lb-name">Yamamoto</p>
+                                    <p class="lb-meta">9 completed · 🔥 3 days</p>
+                                </div>
+                                <span class="lb-score">70%</span>
+                            </div>
+                        </div>
+                    </section>
+
+                </div><!-- end col-right -->
+
+            </div><!-- end dashboard-grid -->
+
+        </div><!-- end content-area -->
+    </main>
+
+    <script src="script.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
