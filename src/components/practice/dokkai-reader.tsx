@@ -27,7 +27,7 @@ function PassageText({ text }: { text: string }) {
 
 /**
  * DokkaiReader — displays a reading passage above practice questions.
- * - Desktop (md+): sticky within the practice layout using `sticky top-4`.
+ * - Desktop (900px+): sticky beside questions, with scrolling for long passages.
  * - Mobile: collapsible accordion to save vertical space.
  * - Supports single `passage` and split `passage_a` / `passage_b` (tougou type).
  */
@@ -42,7 +42,7 @@ export function DokkaiReader({ passage }: DokkaiReaderProps) {
   return (
     <aside
       aria-label="Teks Bacaan Dokkai"
-      className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/30 via-card/80 to-card backdrop-blur-md shadow-glass overflow-hidden"
+      className="min-w-0 rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/30 via-card/80 to-card backdrop-blur-md shadow-glass overflow-hidden app:sticky app:top-6 app:max-h-[calc(100dvh-3rem)] app:overflow-y-auto"
     >
       {/* Header */}
       <button
@@ -51,7 +51,7 @@ export function DokkaiReader({ passage }: DokkaiReaderProps) {
         aria-expanded={isOpen}
         className="flex w-full items-center justify-between gap-3 px-4 py-3 md:py-3.5 text-left hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-t-2xl"
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400">
             <BookOpen className="h-4 w-4" />
           </div>
@@ -66,7 +66,7 @@ export function DokkaiReader({ passage }: DokkaiReaderProps) {
             )}
           </div>
         </div>
-        <span className="shrink-0 text-muted-foreground md:hidden">
+        <span className="shrink-0 text-muted-foreground app:hidden">
           {isOpen ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -78,7 +78,7 @@ export function DokkaiReader({ passage }: DokkaiReaderProps) {
       {/* Body — always visible on desktop, collapsible on mobile */}
       <div
         className={`px-4 pb-4 space-y-4 transition-all duration-300 ${
-          isOpen ? 'block' : 'hidden md:block'
+          isOpen ? 'block' : 'hidden app:block'
         }`}
       >
         {/* Single passage */}
@@ -90,7 +90,7 @@ export function DokkaiReader({ passage }: DokkaiReaderProps) {
 
         {/* A+B split passages (tougou / jouhou style) */}
         {hasAB && (
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3">
             {passage.passage_a && (
               <div className="rounded-xl border border-white/8 bg-white/4 p-4 space-y-2">
                 <span className="inline-block rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-300">

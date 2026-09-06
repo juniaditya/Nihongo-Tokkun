@@ -531,8 +531,10 @@ export function PracticeSession({
         isCompleted={!!resultState}
       />
 
-      {/* Question Card */}
+      <div className={currentPassage ? 'grid items-start gap-6 app:grid-cols-2' : ''}>
       {currentPassage && <DokkaiReader key={currentPassage.id} passage={currentPassage} />}
+      <div className="min-w-0 space-y-6">
+      {/* Question Card */}
       <QuestionCard
         questionNumber={currentIndex + 1}
         questionText={currentQuestion.question_text}
@@ -612,6 +614,8 @@ export function PracticeSession({
           isPendingNext={isSubmitting || isFinalizing}
         />
       )}
+      </div>
+      </div>
     </div>
   );
 }
