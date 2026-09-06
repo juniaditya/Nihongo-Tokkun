@@ -5,6 +5,9 @@ export * from './database.types';
 export type Tables<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Row'];
 
+export type Views<T extends keyof Database['public']['Views']> =
+  Database['public']['Views'][T]['Row'];
+
 export type Enums<T extends keyof Database['public']> = Database['public'][T];
 
 // Domain Models
@@ -32,8 +35,11 @@ export type UserStreak = Tables<'user_streaks'>;
 export type EditLock = Tables<'edit_locks'>;
 
 // Views
-export type UserGlobalStats = Database['public']['Views']['v_user_global_stats']['Row'];
-export type UserCourseStats = Database['public']['Views']['v_user_course_stats']['Row'];
+export type PublicLessonCatalog = Views<'v_public_lesson_catalog'>;
+export type PracticeQuestion = Views<'v_practice_questions'>;
+export type PracticeQuestionOption = Views<'v_practice_question_options'>;
+export type UserGlobalStats = Views<'v_user_global_stats'>;
+export type UserCourseStats = Views<'v_user_course_stats'>;
 
 // App Domain Types
 export type JLPTLevel = 'N5' | 'N4' | 'N3' | 'N2' | 'N1';

@@ -405,6 +405,9 @@ export interface Database {
           total_questions: number;
           correct_answers: number;
           score: number | null;
+          passing_grade_percent: number | null;
+          passed: boolean | null;
+          time_limit_seconds_snapshot: number | null;
           started_at: string;
           completed_at: string | null;
         };
@@ -417,6 +420,9 @@ export interface Database {
           total_questions?: number;
           correct_answers?: number;
           score?: number | null;
+          passing_grade_percent?: number | null;
+          passed?: boolean | null;
+          time_limit_seconds_snapshot?: number | null;
           started_at?: string;
           completed_at?: string | null;
         };
@@ -429,6 +435,9 @@ export interface Database {
           total_questions?: number;
           correct_answers?: number;
           score?: number | null;
+          passing_grade_percent?: number | null;
+          passed?: boolean | null;
+          time_limit_seconds_snapshot?: number | null;
           started_at?: string;
           completed_at?: string | null;
         };
@@ -745,6 +754,24 @@ export interface Database {
           sort_order: number;
         };
       };
+      v_practice_questions: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          question_type: string;
+          question_text: string;
+          sort_order: number;
+          passage_id: string | null;
+        };
+      };
+      v_practice_question_options: {
+        Row: {
+          id: string;
+          question_id: string;
+          option_text: string;
+          option_order: number;
+        };
+      };
       v_user_global_stats: {
         Row: {
           user_id: string;
@@ -773,6 +800,36 @@ export interface Database {
       is_admin: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
+      };
+      start_practice_session: {
+        Args: {
+          p_lesson_id: string;
+          p_question_type: string;
+        };
+        Returns: Json;
+      };
+      submit_practice_answer: {
+        Args: {
+          p_session_id: string;
+          p_question_id: string;
+          p_selected_option_id: string;
+          p_response_time_ms?: number | null;
+        };
+        Returns: Json;
+      };
+      finalize_practice_session: {
+        Args: {
+          p_session_id: string;
+        };
+        Returns: Json;
+      };
+      log_mistake_reason: {
+        Args: {
+          p_attempt_id: string;
+          p_reason: string;
+          p_custom_reason?: string | null;
+        };
+        Returns: Json;
       };
     };
   };

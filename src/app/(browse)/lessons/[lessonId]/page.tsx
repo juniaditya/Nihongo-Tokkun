@@ -112,12 +112,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let hasFlashcards = false;
 
   if (isAccessible) {
-    // Fetch all question_type values and deduplicate in TypeScript
+    // Fetch all question_type values and deduplicate in TypeScript via safe practice view
     const { data: questionRows } = await supabase
-      .from('questions')
+      .from('v_practice_questions')
       .select('question_type')
-      .eq('lesson_id', lessonId)
-      .eq('is_active', true);
+      .eq('lesson_id', lessonId);
 
     if (questionRows) {
       const rawRows = questionRows as { question_type: string }[];
