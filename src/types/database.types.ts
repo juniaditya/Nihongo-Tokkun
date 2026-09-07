@@ -509,6 +509,8 @@ export interface Database {
           reviewed_at: string;
           next_review_at: string | null;
           review_count: number;
+          request_id: string | null;
+          legacy_id: string | null;
         };
         Insert: {
           id?: string;
@@ -518,6 +520,8 @@ export interface Database {
           reviewed_at?: string;
           next_review_at?: string | null;
           review_count?: number;
+          request_id?: string | null;
+          legacy_id?: string | null;
         };
         Update: {
           id?: string;
@@ -527,41 +531,34 @@ export interface Database {
           reviewed_at?: string;
           next_review_at?: string | null;
           review_count?: number;
+          request_id?: string | null;
+          legacy_id?: string | null;
         };
       };
       flashcard_states: {
         Row: {
-          id: string;
           user_id: string;
           flashcard_id: string;
           last_rating: string | null;
           review_count: number;
           last_reviewed_at: string;
           next_review_at: string | null;
-          created_at: string;
-          updated_at: string;
         };
         Insert: {
-          id?: string;
           user_id: string;
           flashcard_id: string;
           last_rating?: string | null;
           review_count?: number;
           last_reviewed_at?: string;
           next_review_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
         };
         Update: {
-          id?: string;
           user_id?: string;
           flashcard_id?: string;
           last_rating?: string | null;
           review_count?: number;
           last_reviewed_at?: string;
           next_review_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
         };
       };
       subscription_tiers: {
@@ -828,6 +825,14 @@ export interface Database {
           p_attempt_id: string;
           p_reason: string;
           p_custom_reason?: string | null;
+        };
+        Returns: Json;
+      };
+      submit_flashcard_review: {
+        Args: {
+          p_flashcard_id: string;
+          p_rating: string;
+          p_request_id: string;
         };
         Returns: Json;
       };

@@ -280,21 +280,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </h2>
 
               {hasFlashcards ? (
-                <div
-                  className="flex items-center gap-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4"
-                  title="Flashcard akan diaktifkan pada tahap berikutnya"
+                <Link
+                  href={`/flashcard/${catalogLesson.id}`}
+                  className="flex items-center justify-between gap-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4 transition-all duration-200 hover:border-indigo-500/50 hover:bg-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/10 group"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15">
-                    <Layers className="h-5 w-5 text-indigo-400" />
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform">
+                      <Layers className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground group-hover:text-indigo-300 transition-colors">
+                        Mulai Sesi Flashcard
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Latihan hafalan kosakata & pola kalimat dengan sistem SRS ala Anki
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">Flashcard tersedia</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <Construction className="h-3 w-3" />
-                      Sesi flashcard akan diaktifkan pada tahap berikutnya
-                    </p>
+                  <div className="shrink-0 flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all group-hover:bg-indigo-500">
+                    Mulai
                   </div>
-                </div>
+                </Link>
               ) : (
                 <div className="rounded-xl border border-white/8 bg-white/4 p-4 text-sm text-muted-foreground">
                   Tidak ada flashcard untuk lesson ini.
