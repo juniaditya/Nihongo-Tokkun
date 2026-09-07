@@ -78,8 +78,7 @@ export default async function FlashcardPage({ params }: FlashcardPageProps) {
       bunpou:bunpou_id (
         id,
         grammar,
-        meaning,
-        explanation
+        meaning
       )
     `)
     .eq('lesson_id', lessonId)

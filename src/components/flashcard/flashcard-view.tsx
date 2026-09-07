@@ -18,7 +18,6 @@ export interface FlashcardExtended extends Flashcard {
     id: string;
     grammar: string;
     meaning: string | null;
-    explanation: string | null;
   } | null;
 }
 
@@ -36,7 +35,7 @@ export function FlashcardView({ card, isFlipped, onFlip, category }: FlashcardVi
   // Resolve back content
   const reading = card.reading || card.kotoba?.reading || null;
   const meaning = card.meaning || card.kotoba?.meaning || card.bunpou?.meaning || null;
-  const explanation = card.explanation || card.kotoba?.explanation || card.bunpou?.explanation || null;
+  const explanation = card.explanation || card.kotoba?.explanation || null;
 
   const handleAudioPlay = (e: React.MouseEvent) => {
     e.stopPropagation();
