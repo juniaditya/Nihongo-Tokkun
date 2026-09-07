@@ -5,12 +5,15 @@ import Link from 'next/link';
 import { BookText, BookOpen, FileText, Lock } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { Database } from '@/types/database.types';
+import { LessonStatusBadge } from '@/components/learning/lesson-status';
+import type { LessonStatus } from '@/lib/learning-progress';
 
 type LessonCatalogRow = Database['public']['Views']['v_public_lesson_catalog']['Row'];
 
 interface LessonTabsProps {
   lessons: LessonCatalogRow[];
   isAuthenticated: boolean;
+  statuses?: Record<string, LessonStatus>;
 }
 
 const CATEGORIES: LessonCatalogRow['category'][] = ['kotoba', 'bunpou', 'dokkai'];
@@ -39,7 +42,7 @@ const CATEGORY_CONFIG: Record<
   },
 };
 
-export function LessonTabs({ lessons, isAuthenticated }: LessonTabsProps) {
+export function LessonTabs({ lessons, isAuthenticated, statuses }: LessonTabsProps) {
   // Determine which categories actually have lessons
   const availableCategories = CATEGORIES.filter((cat) =>
     lessons.some((l) => l.category === cat)
@@ -129,6 +132,7 @@ export function LessonTabs({ lessons, isAuthenticated }: LessonTabsProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-foreground truncate">{lessonLabel}</p>
+                  {isAuthenticated && statuses && <div className="my-1"><LessonStatusBadge status={statuses[lesson.id]} /></div>}
                   <p className="text-xs text-muted-foreground">
                     {CATEGORY_CONFIG[lesson.category].labelJa} · Unit {lesson.number}
                     {lesson.time_limit_seconds && (

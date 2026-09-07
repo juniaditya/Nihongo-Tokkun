@@ -9,6 +9,7 @@ import { JLPTBadge } from '@/components/learning/jlpt-badge';
 import { LessonTabs } from '@/components/learning/lesson-tabs';
 import { ChevronRight } from 'lucide-react';
 import type { Database } from '@/types/database.types';
+import { readAll, type LessonStatus } from '@/lib/learning-progress';
 
 type CourseRow = Database['public']['Tables']['courses']['Row'];
 type LessonCatalogRow = Database['public']['Views']['v_public_lesson_catalog']['Row'];
@@ -77,6 +78,17 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
   }
 
   const lessonList = (lessonsData ?? []) as LessonCatalogRow[];
+  let statuses: Record<string, LessonStatus> | undefined;
+  let progressError = false;
+  if (user) {
+    try {
+      const progress = await readAll<{ lesson_id: string; status: LessonStatus }>((from, to) => supabase.from('lesson_progress').select('lesson_id,status').eq('user_id', user.id).order('lesson_id').range(from, to));
+      statuses = Object.fromEntries(progress.map(row => [row.lesson_id, row.status]));
+    } catch (error) {
+      console.error('[CourseDetailPage] progress:', error);
+      progressError = true;
+    }
+  }
 
   return (
     <Container size="xl" className="py-8 space-y-8">
@@ -111,6 +123,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
       </p>
 
       {/* Category Tabs + Lesson List (Client Component) */}
+      {progressError && <p role="alert" className="text-sm text-muted-foreground">Status belajarmu belum dapat dimuat. Silakan muat ulang halaman.</p>}
       {lessonList.length === 0 ? (
         <EmptyState
           icon={null}
@@ -118,7 +131,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
           description="Lesson untuk kursus ini belum tersedia."
         />
       ) : (
-        <LessonTabs lessons={lessonList} isAuthenticated={isAuthenticated} />
+        <LessonTabs lessons={lessonList} isAuthenticated={isAuthenticated} statuses={statuses} />
       )}
     </Container>
   );

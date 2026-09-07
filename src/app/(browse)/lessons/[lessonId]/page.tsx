@@ -17,6 +17,8 @@ import {
   Construction,
 } from 'lucide-react';
 import type { Database } from '@/types/database.types';
+import { LessonStatusBadge } from '@/components/learning/lesson-status';
+import { questionTypeLabel, type LessonStatus } from '@/lib/learning-progress';
 
 type LessonCatalogRow = Database['public']['Views']['v_public_lesson_catalog']['Row'];
 type CourseRow = Database['public']['Tables']['courses']['Row'];
@@ -34,25 +36,6 @@ const CATEGORY_CONFIG: Record<
   dokkai: { label: 'Dokkai', labelJa: '読解', icon: FileText, color: 'text-amber-400' },
 };
 
-function questionTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    arti: '意味 · Arti Kata',
-    cara_baca: '読み方 · Cara Baca Kanji',
-    penggunaan_kalimat: '用法 · Penggunaan Kalimat',
-    cara_pakai: '文脈規定 · Cara Pakai',
-    sinonim: '類義語 · Sinonim',
-    grammar_choice: '文法形式 · Pilihan Grammar',
-    fill_in: '穴埋め · Isi Kosong',
-    ordering: '文の組み立て · Urutan Kalimat',
-    comprehension: '文章読解 · Pemahaman',
-    meaning: '意味 · Arti',
-    reading: '読み方 · Bacaan',
-    usage: '用法 · Penggunaan',
-    context: '文脈 · Konteks',
-    synonym: '類義語 · Sinonim',
-  };
-  return labels[type] ?? type;
-}
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
   const { lessonId } = await params;
@@ -115,6 +98,22 @@ export default async function LessonPage({ params }: LessonPageProps) {
   // 3. Fetch content data only if accessible
   let questionTypes: string[] = [];
   let hasFlashcards = false;
+  let lessonStatus: LessonStatus = 'not_started';
+  let typeProgress: Pick<Database['public']['Tables']['lesson_type_progress']['Row'], 'question_type' | 'passed'>[] = [];
+  let progressError = false;
+  if (user) {
+    const [progress, types] = await Promise.all([
+      supabase.from('lesson_progress').select('status').eq('user_id', user.id).eq('lesson_id', lessonId).maybeSingle(),
+      supabase.from('lesson_type_progress').select('question_type,passed').eq('user_id', user.id).eq('lesson_id', lessonId),
+    ]);
+    if (progress.error || types.error) {
+      console.error('[LessonPage] progress:', progress.error?.message ?? types.error?.message);
+      progressError = true;
+    } else {
+      lessonStatus = (progress.data as { status: LessonStatus } | null)?.status ?? 'not_started';
+      typeProgress = types.data ?? [];
+    }
+  }
 
   if (isAccessible) {
     // Fetch all question_type values and deduplicate in TypeScript via safe practice view
@@ -182,6 +181,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       />
 
       {/* Timer badge */}
+      {user && (progressError ? <p role="alert" className="text-sm text-muted-foreground">Status belajarmu belum dapat dimuat. Silakan muat ulang halaman.</p> : <LessonStatusBadge status={lessonStatus} />)}
       {catalogLesson.time_limit_seconds && isAccessible && (
         <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
           <Clock className="h-3.5 w-3.5" />
@@ -253,6 +253,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                         <p className="text-xs text-muted-foreground mt-0.5">
                           Mode latihan 4 pilihan
                         </p>
+                        {user && !progressError && <p className="text-xs font-medium mt-1 text-primary-500">{typeProgress.find(row => row.question_type === type)?.passed ? 'Lulus ✓' : 'Belum lulus'}</p>}
                       </div>
                     </div>
 
