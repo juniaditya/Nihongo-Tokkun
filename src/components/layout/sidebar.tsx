@@ -203,7 +203,7 @@ export function Sidebar({ username, role, tierCode }: SidebarProps) {
             <div className="min-w-0">
               <p className="text-xs font-semibold text-foreground truncate">{username}</p>
               <p className="text-[10px] text-muted-foreground capitalize">
-                {role} · {tierCode}
+                {role === 'admin' ? 'Administrator' : 'Pelajar'} · {tierCode === 'premium' ? 'Premium' : 'Gratis'}
               </p>
             </div>
           </div>
