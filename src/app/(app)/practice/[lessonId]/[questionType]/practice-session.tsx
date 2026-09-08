@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PracticeSkeleton } from '@/components/practice/practice-skeleton';
 import { PracticeHeader } from '@/components/practice/practice-header';
@@ -82,6 +83,7 @@ export function PracticeSession({
   mistakePresets,
 }: PracticeSessionProps) {
   const supabase = createClient();
+  const router = useRouter();
 
   // Lifecycle & Session State
   const [isLoading, setIsLoading] = useState(true);
@@ -156,6 +158,8 @@ export function PracticeSession({
 
         const payload = finData as unknown as ResultState;
         setResultState(payload);
+        // Clear prefetched progress pages after the browser RPC changes learner data.
+        router.refresh();
         void loadProgress();
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Gagal menyelesaikan sesi latihan.';
@@ -165,7 +169,7 @@ export function PracticeSession({
         setIsFinalizing(false);
       }
     },
-    [supabase, loadProgress]
+    [supabase, loadProgress, router]
   );
 
   // Initialize or resume practice session
