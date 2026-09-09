@@ -11,6 +11,7 @@ interface MistakeLoggerProps {
   presets: MistakePreset[];
   initialReason?: string;
   initialCustomReason?: string;
+  onValidityChange: (valid: boolean) => void;
   onLogReason: (attemptId: string, reason: string, customReason?: string) => Promise<boolean>;
 }
 
@@ -20,13 +21,18 @@ export function MistakeLogger({
   initialReason,
   initialCustomReason,
   onLogReason,
+  onValidityChange,
 }: MistakeLoggerProps) {
   const [selectedReason, setSelectedReason] = useState<string>(initialReason ?? '');
   const [customText, setCustomText] = useState<string>(initialCustomReason ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(!!initialReason);
 
+  const [saveError, setSaveError] = useState(false);
+
   const handleSelectPreset = async (label: string) => {
+    onValidityChange(false);
+    setSaveError(false);
     setSelectedReason(label);
     setSavedSuccess(false);
 
@@ -34,7 +40,9 @@ export function MistakeLogger({
       setIsSaving(true);
       const ok = await onLogReason(attemptId, label);
       setIsSaving(false);
-      if (ok) setSavedSuccess(true);
+      setSavedSuccess(ok);
+      setSaveError(!ok);
+      onValidityChange(ok);
     }
   };
 
@@ -44,7 +52,9 @@ export function MistakeLogger({
     setSavedSuccess(false);
     const ok = await onLogReason(attemptId, 'Lainnya', customText.trim());
     setIsSaving(false);
-    if (ok) setSavedSuccess(true);
+    setSavedSuccess(ok);
+      setSaveError(!ok);
+      onValidityChange(ok);
   };
 
   return (
@@ -52,7 +62,7 @@ export function MistakeLogger({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           <Tag className="h-3.5 w-3.5 text-secondary-400" />
-          <span>Catat Alasan Kesalahan (Opsional)</span>
+          <span>Catat Alasan Kesalahan (Wajib)</span>
         </div>
 
         {isSaving && (
@@ -70,6 +80,7 @@ export function MistakeLogger({
         )}
       </div>
 
+      {saveError && <p role="alert" className="text-sm text-red-400">Alasan belum tersimpan. Silakan coba lagi.</p>}
       {/* Preset pills */}
       <div className="flex flex-wrap gap-2">
         {presets.map((preset) => {
@@ -110,8 +121,11 @@ export function MistakeLogger({
       {selectedReason === 'Lainnya' && (
         <div className="pt-2 space-y-2">
           <textarea
+            aria-label="Alasan lainnya"
+            required
             value={customText}
             onChange={(e) => {
+              onValidityChange(false);
               setCustomText(e.target.value);
               setSavedSuccess(false);
             }}

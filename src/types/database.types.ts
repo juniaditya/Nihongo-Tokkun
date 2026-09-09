@@ -337,6 +337,7 @@ export interface Database {
           lesson_id: string;
           kotoba_id: string | null;
           bunpou_id: string | null;
+          is_supplementary: boolean;
           front: string;
           reading: string | null;
           meaning: string | null;
@@ -367,6 +368,7 @@ export interface Database {
           lesson_id?: string;
           kotoba_id?: string | null;
           bunpou_id?: string | null;
+          is_supplementary?: boolean;
           front?: string;
           reading?: string | null;
           meaning?: string | null;
@@ -846,6 +848,10 @@ export interface Database {
           p_session_id: string;
         };
         Returns: Json;
+      };
+      get_lesson_mistakes: {
+        Args: { p_lesson_id: string };
+        Returns: { attempt_id: string; question_text: string; selected_answer: string | null; correct_answer: string | null; reason: string | null; custom_reason: string | null; answered_at: string }[];
       };
       log_mistake_reason: {
         Args: {

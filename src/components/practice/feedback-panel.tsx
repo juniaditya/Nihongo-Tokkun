@@ -1,5 +1,5 @@
-import React from 'react';
-import { CheckCircle2, XCircle, ArrowRight, BookOpen, Sparkles, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, XCircle, ArrowRight, BookOpen, Loader2 } from 'lucide-react';
 import { MistakeLogger, type MistakePreset } from './mistake-logger';
 
 interface FeedbackPanelProps {
@@ -27,6 +27,8 @@ export function FeedbackPanel({
   isLastQuestion,
   isPendingNext,
 }: FeedbackPanelProps) {
+  const [reasonSaved, setReasonSaved] = useState(false);
+  const canContinue = isCorrect || reasonSaved;
   const hasExplanations =
     !!questionExplanation || !!selectedOptionExplanation || !!correctOptionExplanation;
 
@@ -63,26 +65,6 @@ export function FeedbackPanel({
           </div>
         </div>
 
-        {/* Next Button on header for quick action */}
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={isPendingNext}
-          className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all ${
-            isCorrect
-              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90'
-              : 'bg-gradient-to-r from-primary-500 to-secondary-500 hover:opacity-90'
-          }`}
-        >
-          {isPendingNext ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <>
-              <span>{isLastQuestion ? 'Selesai & Lihat Hasil' : 'Lanjut'}</span>
-              <ArrowRight className="h-4 w-4" />
-            </>
-          )}
-        </button>
       </div>
 
       {/* Explanations section */}
@@ -117,13 +99,38 @@ export function FeedbackPanel({
       )}
 
       {/* Mistake Reason Logging for Incorrect Attempts */}
-      {!isCorrect && attemptId && presets.length > 0 && (
+      {!isCorrect && attemptId && (
         <MistakeLogger
+          onValidityChange={setReasonSaved}
           attemptId={attemptId}
           presets={presets}
           onLogReason={onLogReason}
         />
       )}
+      {!canContinue && <p className="text-xs text-muted-foreground">Pilih dan simpan alasan kesalahan untuk melanjutkan.</p>}
+      <div className="flex justify-end pt-2">
+        {/* Next Button on header for quick action */}
+        <button
+          type="button"
+          onClick={() => { if (canContinue) onNext(); }}
+          disabled={isPendingNext || !canContinue}
+          className={`w-full sm:w-auto inline-flex justify-center items-center gap-2 disabled:opacity-50 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-all ${
+            isCorrect
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90'
+              : 'bg-gradient-to-r from-primary-500 to-secondary-500 hover:opacity-90'
+          }`}
+        >
+          {isPendingNext ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <span>{isLastQuestion ? 'Selesai & Lihat Hasil' : 'Lanjut ke Soal Berikutnya'}</span>
+              <ArrowRight className="h-4 w-4" />
+            </>
+          )}
+        </button>
+
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   BookOpen,
-  Layers,
+  ChartNoAxesCombined,
   Trophy,
   User,
   ChevronLeft,
@@ -28,7 +28,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/courses', icon: BookOpen, label: 'Kursus' },
-  { href: '/flashcard', icon: Layers, label: 'Flashcard' },
+  { href: '/progress', icon: ChartNoAxesCombined, label: 'Progress' },
   { href: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { href: '/profile', icon: User, label: 'Profil' },
 ];

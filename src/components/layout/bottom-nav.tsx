@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, BookOpen, Layers, Trophy, User } from 'lucide-react';
+import { LayoutDashboard, BookOpen, ChartNoAxesCombined, Trophy, User } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface NavItem {
@@ -16,7 +16,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', exact: true },
   { href: '/courses', icon: BookOpen, label: 'Kursus' },
-  { href: '/flashcard', icon: Layers, label: 'Flashcard' },
+  { href: '/progress', icon: ChartNoAxesCombined, label: 'Progress' },
   { href: '/leaderboard', icon: Trophy, label: 'Leaderboard' },
   { href: '/profile', icon: User, label: 'Profil' },
 ];

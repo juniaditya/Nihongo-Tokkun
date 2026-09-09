@@ -83,6 +83,7 @@ export default async function FlashcardPage({ params }: FlashcardPageProps) {
     `)
     .eq('lesson_id', lessonId)
     .eq('is_active', true)
+    .eq('is_supplementary', false)
     .order('sort_order', { ascending: true });
 
   if (fcError) {

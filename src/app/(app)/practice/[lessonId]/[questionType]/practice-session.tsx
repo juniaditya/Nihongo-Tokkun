@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { SessionExitGuard } from '@/components/learning/session-exit-guard';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PracticeSkeleton } from '@/components/practice/practice-skeleton';
@@ -315,9 +316,14 @@ export function PracticeSession({
           }
           setAnsweredMap(newAnsweredMap);
 
-          // Find first unanswered question
+          const { data: loggedReasons, error: reasonsError } = await supabase.from('mistake_logs')
+            .select('attempt_id,reason,custom_reason').in('attempt_id', attemptsData.map(a => a.id));
+          if (reasonsError) throw new Error('Gagal memuat alasan kesalahan.');
+          const validReasons = new Set((loggedReasons as {attempt_id:string;reason:string|null;custom_reason:string|null}[] ?? [])
+            .filter(r => r.reason && (r.reason !== 'Lainnya' || r.custom_reason?.trim())).map(r => r.attempt_id));
+          // Resume unanswered questions or feedback still requiring a reason.
           const firstUnansweredIdx = assembledQuestions.findIndex(
-            (q) => !newAnsweredMap.has(q.id)
+            (q) => { const answer = newAnsweredMap.get(q.id); return !answer || (!answer.is_correct && !validReasons.has(answer.attempt_id)); }
           );
 
           if (firstUnansweredIdx === -1) {
@@ -326,6 +332,8 @@ export function PracticeSession({
             return;
           } else {
             setCurrentIndex(firstUnansweredIdx);
+            const existing = newAnsweredMap.get(assembledQuestions[firstUnansweredIdx].id);
+            if (existing) { setFeedbackState(existing); setSelectedOptionId(existing.selected_option_id); }
           }
         } else {
           setCurrentIndex(0);
@@ -406,8 +414,9 @@ export function PracticeSession({
     if (currentIndex + 1 < questions.length) {
       const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
-      setSelectedOptionId(null);
-      setFeedbackState(null);
+      const existing = answeredMap.get(questions[nextIdx].id);
+      setSelectedOptionId(existing?.selected_option_id ?? null);
+      setFeedbackState(existing ?? null);
       setSubmitError(null);
       questionStartTimeRef.current = Date.now();
     } else {
@@ -521,6 +530,7 @@ export function PracticeSession({
 
   return (
     <div className={`mx-auto ${containerWidth} px-4 py-6 md:py-8 space-y-6`}>
+      <SessionExitGuard active={!!sessionId && !resultState} kind="practice" />
       {/* Header */}
       <PracticeHeader
         lessonId={lessonId}
@@ -606,6 +616,7 @@ export function PracticeSession({
       {/* Post-Submission Feedback Panel */}
       {isSubmitted && feedbackState && (
         <FeedbackPanel
+          key={feedbackState.attempt_id}
           isCorrect={feedbackState.is_correct}
           questionExplanation={feedbackState.question_explanation}
           selectedOptionExplanation={feedbackState.selected_option_explanation}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { X, Clock, AlertTriangle } from 'lucide-react';
-import { Modal } from '@/components/ui/modal';
+import { X, Clock } from 'lucide-react';
+
 
 interface PracticeHeaderProps {
   lessonId: string;
@@ -28,7 +28,6 @@ export function PracticeHeader({
   onTimeExpired,
   isCompleted = false,
 }: PracticeHeaderProps) {
-  const [showExitModal, setShowExitModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   const progressPercent = totalQuestions > 0 ? Math.min(100, Math.round(((currentIndex) / totalQuestions) * 100)) : 0;
@@ -87,14 +86,13 @@ export function PracticeHeader({
         {/* Top bar */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <button
-              type="button"
-              onClick={() => setShowExitModal(true)}
+            <Link
+              href={`/lessons/${lessonId}`}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               aria-label="Tutup sesi latihan"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Link>
 
             <div className="min-w-0">
               <h1 className="text-sm font-semibold text-foreground truncate">
@@ -146,39 +144,6 @@ export function PracticeHeader({
         </div>
       </header>
 
-      {/* Exit Confirmation Modal */}
-      <Modal
-        isOpen={showExitModal}
-        onClose={() => setShowExitModal(false)}
-        title="Keluar dari Latihan?"
-        description="Progres Anda pada sesi ini tersimpan dan dapat dilanjutkan kembali kapan saja."
-        className="max-w-sm"
-      >
-        <div className="space-y-4 pt-2">
-          <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>
-              Jawaban yang sudah tersimpan akan tetap tercatat. Anda bisa kembali melanjutkan sesi ini nanti.
-            </span>
-          </div>
-
-          <div className="flex justify-end gap-2.5 pt-2">
-            <button
-              type="button"
-              onClick={() => setShowExitModal(false)}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-foreground hover:bg-white/10 transition-colors"
-            >
-              Lanjutkan Latihan
-            </button>
-            <Link
-              href={`/lessons/${lessonId}`}
-              className="rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2 text-xs font-semibold text-white shadow hover:opacity-90 transition-opacity"
-            >
-              Keluar
-            </Link>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { SessionExitGuard } from '@/components/learning/session-exit-guard';
 import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { FlashcardHeader } from './flashcard-header';
@@ -38,6 +40,7 @@ export function FlashcardSession({
   const [againCount, setAgainCount] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  const router = useRouter();
   const supabase = createClient();
   const currentCard = cards[currentIndex] || null;
   const totalCards = cards.length;
@@ -100,6 +103,7 @@ export function FlashcardSession({
           setCurrentIndex((prev) => prev + 1);
         } else {
           setIsCompleted(true);
+          router.refresh();
         }
       } catch (err: any) {
         console.error('[Flashcard] Network exception:', err);
@@ -107,7 +111,7 @@ export function FlashcardSession({
         setIsSubmitting(false);
       }
     },
-    [currentCard, isSubmitting, pendingRequestId, currentIndex, totalCards, supabase]
+    [currentCard, isSubmitting, pendingRequestId, currentIndex, totalCards, supabase, router]
   );
 
   const handleRetry = useCallback(() => {
@@ -124,7 +128,7 @@ export function FlashcardSession({
         return;
       }
 
-      if (isCompleted) return;
+      if (isCompleted || document.querySelector('[role=dialog]')) return;
 
       if (e.code === 'Space' || e.key === 'Enter') {
         e.preventDefault();
@@ -185,6 +189,7 @@ export function FlashcardSession({
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6 sm:space-y-8">
+      <SessionExitGuard active={!isCompleted && totalCards > 0} kind="flashcard" />
       {/* Session Header */}
       <FlashcardHeader
         lessonId={lessonId}
