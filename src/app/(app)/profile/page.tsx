@@ -1,3 +1,5 @@
+import {SubscriptionSummary} from '@/components/learning/subscription-summary';
+import type {Subscription} from '@/lib/subscriptions';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -18,6 +20,8 @@ export default async function ProfilePage() {
     supabase.from('v_user_global_stats').select('sessions_completed,accuracy_percent,total_time_seconds').eq('user_id', user.id).maybeSingle(),
     supabase.from('lesson_progress').select('lesson_id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed'),
   ]);
+  const subscription = await supabase.from('user_subscriptions').select('*').eq('user_id',user.id).maybeSingle();
+  if(subscription.error)console.error('[Profile subscription]',subscription.error.message);
   const username = (profile.data as { username: string | null } | null)?.username?.trim() || 'Pelajar';
   const stats = summary.data as Stats | null;
   const statsError = summary.error || completed.error;
@@ -38,6 +42,7 @@ export default async function ProfilePage() {
       <p className="text-muted-foreground">Ringkasan perjalanan belajarmu.</p>
       {profile.error && <p role="alert" className="text-sm text-muted-foreground">Nama pengguna belum dapat dimuat.</p>}
     </header>
+    <section aria-label="Paket langganan" className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4"><h2 className="text-xl font-bold">Paket Langganan</h2>{subscription.error ? <p role="alert">Paket belum dapat dimuat.</p> : <SubscriptionSummary subscription={subscription.data as Subscription|null}/>}</section>
     {statsError ? <div role="alert" className="rounded-2xl border border-white/10 bg-white/5 p-6"><p>Statistik belum dapat dimuat. Silakan muat ulang halaman.</p></div> : <>
       <section aria-label="Statistik profil" className="grid gap-4 sm:grid-cols-2">
         {cards.map(([label, value]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6"><h2 className="text-sm text-muted-foreground">{label}</h2><p className="mt-3 text-2xl font-bold">{value}</p></div>)}

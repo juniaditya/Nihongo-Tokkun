@@ -380,6 +380,12 @@ export interface Database {
           updated_at?: string;
         };
       };
+      user_subscriptions: {
+        Relationships: [];
+        Row: { user_id: string; plan_type: 'jlpt_intensive' | 'nihongo_regular'; jlpt_level: string | null; started_at: string; expires_at: string | null; updated_at: string };
+        Insert: { user_id: string; plan_type: 'jlpt_intensive' | 'nihongo_regular'; jlpt_level?: string | null; started_at?: string; expires_at?: string | null; updated_at?: string };
+        Update: { plan_type?: 'jlpt_intensive' | 'nihongo_regular'; jlpt_level?: string | null; started_at?: string; expires_at?: string | null };
+      };
       profiles: {
         Relationships: [];
         Row: {
