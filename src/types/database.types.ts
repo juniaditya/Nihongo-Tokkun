@@ -10,6 +10,7 @@ export interface Database {
   public: {
     Tables: {
       courses: {
+        Relationships: [];
         Row: {
           id: string;
           name: string;
@@ -36,6 +37,7 @@ export interface Database {
         };
       };
       lessons: {
+        Relationships: [];
         Row: {
           id: string;
           course_id: string;
@@ -80,6 +82,7 @@ export interface Database {
         };
       };
       kotoba: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -124,6 +127,7 @@ export interface Database {
         };
       };
       kotoba_relations: {
+        Relationships: [];
         Row: {
           id: string;
           kotoba_id: string;
@@ -150,6 +154,7 @@ export interface Database {
         };
       };
       bunpou: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -200,6 +205,7 @@ export interface Database {
         };
       };
       dokkai_passages: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -244,6 +250,7 @@ export interface Database {
         };
       };
       questions: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -291,6 +298,7 @@ export interface Database {
         };
       };
       question_options: {
+        Relationships: [];
         Row: {
           id: string;
           question_id: string;
@@ -323,6 +331,7 @@ export interface Database {
         };
       };
       flashcards: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -370,6 +379,7 @@ export interface Database {
         };
       };
       profiles: {
+        Relationships: [];
         Row: {
           id: string;
           username: string | null;
@@ -396,6 +406,7 @@ export interface Database {
         };
       };
       practice_sessions: {
+        Relationships: [];
         Row: {
           id: string;
           user_id: string;
@@ -443,6 +454,7 @@ export interface Database {
         };
       };
       question_attempts: {
+        Relationships: [];
         Row: {
           id: string;
           session_id: string;
@@ -475,6 +487,7 @@ export interface Database {
         };
       };
       mistake_logs: {
+        Relationships: [];
         Row: {
           id: string;
           attempt_id: string;
@@ -501,6 +514,7 @@ export interface Database {
         };
       };
       flashcard_reviews: {
+        Relationships: [];
         Row: {
           id: string;
           user_id: string;
@@ -536,6 +550,7 @@ export interface Database {
         };
       };
       flashcard_states: {
+        Relationships: [];
         Row: {
           user_id: string;
           flashcard_id: string;
@@ -562,6 +577,7 @@ export interface Database {
         };
       };
       subscription_tiers: {
+        Relationships: [];
         Row: {
           id: string;
           code: string;
@@ -594,6 +610,7 @@ export interface Database {
         };
       };
       lesson_progress: {
+        Relationships: [];
         Row: {
           id: string;
           user_id: string;
@@ -623,6 +640,7 @@ export interface Database {
         };
       };
       lesson_type_progress: {
+        Relationships: [];
         Row: {
           user_id: string;
           lesson_id: string;
@@ -652,6 +670,7 @@ export interface Database {
         };
       };
       app_config: {
+        Relationships: [];
         Row: {
           key: string;
           value: string;
@@ -672,6 +691,7 @@ export interface Database {
         };
       };
       mistake_reason_presets: {
+        Relationships: [];
         Row: {
           id: string;
           label: string;
@@ -695,6 +715,7 @@ export interface Database {
         };
       };
       user_streaks: {
+        Relationships: [];
         Row: {
           user_id: string;
           current_streak: number;
@@ -718,6 +739,7 @@ export interface Database {
         };
       };
       edit_locks: {
+        Relationships: [];
         Row: {
           target_key: string;
           user_id: string;
@@ -740,6 +762,7 @@ export interface Database {
     };
     Views: {
       v_public_lesson_catalog: {
+        Relationships: [];
         Row: {
           id: string;
           course_id: string;
@@ -752,6 +775,7 @@ export interface Database {
         };
       };
       v_practice_questions: {
+        Relationships: [];
         Row: {
           id: string;
           lesson_id: string;
@@ -762,6 +786,7 @@ export interface Database {
         };
       };
       v_practice_question_options: {
+        Relationships: [];
         Row: {
           id: string;
           question_id: string;
@@ -770,6 +795,7 @@ export interface Database {
         };
       };
       v_user_global_stats: {
+        Relationships: [];
         Row: {
           user_id: string;
           sessions_completed: number;
@@ -781,6 +807,7 @@ export interface Database {
         };
       };
       v_user_course_stats: {
+        Relationships: [];
         Row: {
           user_id: string;
           course_id: string;

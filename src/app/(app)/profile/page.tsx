@@ -14,7 +14,7 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const [profile, summary, completed] = await Promise.all([
-    supabase.from('profiles').select('username').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('username,role').eq('id', user.id).maybeSingle(),
     supabase.from('v_user_global_stats').select('sessions_completed,accuracy_percent,total_time_seconds').eq('user_id', user.id).maybeSingle(),
     supabase.from('lesson_progress').select('lesson_id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'completed'),
   ]);
@@ -45,6 +45,7 @@ export default async function ProfilePage() {
       {sessions === 0 && <div className="rounded-2xl border border-primary-500/20 bg-primary-500/5 p-5 space-y-2"><p className="font-semibold">Belum ada latihan selesai.</p><p className="text-sm text-muted-foreground">Mulai lesson pertamamu dan lihat progress di sini.</p></div>}
     </>}
     <div className="flex flex-col sm:flex-row gap-3">
+      {(profile.data as {role:string}|null)?.role === 'admin' && <Link href="/admin" className="rounded-xl border border-border px-5 py-3 text-sm font-semibold text-primary-500">Administrasi</Link>}
       <Link href="/courses" className="inline-flex justify-center rounded-xl bg-gradient-to-r from-primary-500 to-secondary-500 px-5 py-3 text-sm font-semibold text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">Lanjut Belajar</Link>
       <form action={logout}><button type="submit" className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-600 dark:text-rose-300 hover:bg-rose-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500">Keluar dari Akun</button></form>
     </div>

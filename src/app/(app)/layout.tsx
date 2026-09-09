@@ -86,7 +86,7 @@ export default async function MainLayout({
       </main>
 
       {/* Mobile Bottom Navigation — hidden ≥900px */}
-      <BottomNav role={role} />
+      <BottomNav />
     </div>
   );
 }

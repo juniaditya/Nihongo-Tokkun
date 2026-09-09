@@ -21,11 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/profile', icon: User, label: 'Profil' },
 ];
 
-interface BottomNavProps {
-  role?: string;
-}
-
-export function BottomNav({ role = 'user' }: BottomNavProps) {
+export function BottomNav() {
   const pathname = usePathname();
 
   const isActive = (item: NavItem) => {
@@ -83,35 +79,6 @@ export function BottomNav({ role = 'user' }: BottomNavProps) {
         );
       })}
 
-      {role === 'admin' && (
-        <Link
-          href="/admin"
-          className={cn(
-            'flex flex-1 flex-col items-center justify-center gap-0.5 py-2',
-            'text-[10px] font-medium transition-colors duration-150',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-inset',
-            pathname.startsWith('/admin')
-              ? 'text-red-400'
-              : 'text-muted-foreground hover:text-red-400 active:text-red-400'
-          )}
-        >
-          <span
-            className={cn(
-              'relative flex items-center justify-center',
-              pathname.startsWith('/admin') &&
-                'before:absolute before:-top-0.5 before:left-1/2 before:-translate-x-1/2 before:h-0.5 before:w-5 before:rounded-full before:bg-red-400'
-            )}
-          >
-            <LayoutDashboard
-              className={cn(
-                'h-5 w-5 shrink-0 transition-transform duration-150',
-                pathname.startsWith('/admin') && 'scale-110'
-              )}
-            />
-          </span>
-          <span className="leading-none">Admin</span>
-        </Link>
-      )}
     </nav>
   );
 }

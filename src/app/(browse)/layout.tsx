@@ -94,7 +94,7 @@ export default async function BrowseLayout({
       </main>
 
       {/* Mobile Bottom Navigation — only for authenticated users */}
-      {isAuthenticated && <BottomNav role={role} />}
+      {isAuthenticated && <BottomNav />}
     </div>
   );
 }
