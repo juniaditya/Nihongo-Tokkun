@@ -1,3 +1,6 @@
+import { Container } from '@/components/layout/container';
+import { getContentAccess } from '@/lib/content-access';
+import { ContentLocked } from '@/components/learning/content-locked';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -64,7 +67,7 @@ export default async function PracticePage({ params }: PracticePageProps) {
   // 1. Fetch lesson catalog metadata from safe view
   const { data: catalogData, error: catalogErr } = await supabase
     .from('v_public_lesson_catalog')
-    .select('id, category, number, title')
+    .select('id, course_id, category, number, title')
     .eq('id', lessonId)
     .maybeSingle();
 
@@ -74,6 +77,8 @@ export default async function PracticePage({ params }: PracticePageProps) {
   }
 
   const catalogLesson = catalogData as LessonCatalogRow;
+  const access = await getContentAccess(catalogLesson.course_id, lessonId);
+  if (!access.allowed) return <Container size="lg" className="py-8"><ContentLocked access={access} /></Container>;
   const category = catalogLesson.category;
   const lessonTitle =
     catalogLesson.title ?? `${category === 'kotoba' ? 'Kotoba' : category === 'bunpou' ? 'Bunpou' : 'Dokkai'} ${catalogLesson.number}`;

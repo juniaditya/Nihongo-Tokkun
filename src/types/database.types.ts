@@ -829,6 +829,14 @@ export interface Database {
       };
     };
     Functions: {
+      get_content_access: {
+        Args: { p_course_id: string; p_lesson_id?: string | null };
+        Returns: Json;
+      };
+      can_user_access_lesson: {
+        Args: { p_lesson_id: string };
+        Returns: boolean;
+      };
       is_admin: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;

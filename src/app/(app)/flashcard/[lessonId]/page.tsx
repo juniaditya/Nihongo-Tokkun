@@ -1,3 +1,6 @@
+import { Container } from '@/components/layout/container';
+import { getContentAccess } from '@/lib/content-access';
+import { ContentLocked } from '@/components/learning/content-locked';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { FlashcardSession } from '@/components/flashcard/flashcard-session';
@@ -35,6 +38,9 @@ export default async function FlashcardPage({ params }: FlashcardPageProps) {
   if (lessonError || !lesson) {
     notFound();
   }
+
+  const access = await getContentAccess(lesson.course_id, lessonId);
+  if (!access.allowed) return <Container size="lg" className="py-8"><ContentLocked access={access} /></Container>;
 
   // Dokkai lessons have no flashcard per PRD
   if (lesson.category === 'dokkai') {

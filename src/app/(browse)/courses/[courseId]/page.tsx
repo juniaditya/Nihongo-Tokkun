@@ -1,3 +1,5 @@
+import { getContentAccess } from '@/lib/content-access';
+import { ContentLocked } from '@/components/learning/content-locked';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -66,6 +68,9 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
 
   const course = courseData as Pick<CourseRow, 'id' | 'name' | 'level' | 'description'>;
 
+  const access = await getContentAccess(courseId);
+  if (!access.allowed) return <Container size="xl" className="py-8 space-y-8"><PageHeader title={course.name} description={course.description ?? undefined} /><ContentLocked access={access} /></Container>;
+
   // Fetch lesson catalog via the safe public view
   const { data: lessonsData, error: lessonsError } = await supabase
     .from('v_public_lesson_catalog')
@@ -131,7 +136,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
           description="Lesson untuk kursus ini belum tersedia."
         />
       ) : (
-        <LessonTabs lessons={lessonList} isAuthenticated={isAuthenticated} statuses={statuses} />
+        <LessonTabs lessons={lessonList} isAuthenticated={isAuthenticated} fullAccess={access.full_access} statuses={statuses} />
       )}
     </Container>
   );

@@ -1,3 +1,4 @@
+import { getContentAccess, accessMessage } from '@/lib/content-access';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight, BookOpen } from 'lucide-react';
@@ -46,6 +47,8 @@ export default async function CoursesPage() {
 
   const catalog = (catalogData ?? []) as Pick<LessonCatalogRow, 'course_id' | 'category'>[];
   const courses = (coursesData ?? []) as Pick<CourseRow, 'id' | 'name' | 'level' | 'description'>[];
+
+  const accessByCourse = Object.fromEntries(await Promise.all(courses.map(async course => [course.id, await getContentAccess(course.id)] as const)));
 
   // Build per-course category sets and lesson counts
   const categoriesByCourse: Record<string, Set<LessonCatalogRow['category']>> = {};
@@ -105,6 +108,7 @@ export default async function CoursesPage() {
                   </p>
                 )}
 
+                {!accessByCourse[course.id].allowed && <div className="mb-4 space-y-1"><p className="text-sm font-semibold text-amber-400">Terkunci</p><p className="text-sm text-muted-foreground">{accessMessage(accessByCourse[course.id])}</p></div>}
                 <div className="mt-auto pt-4 border-t border-white/5 space-y-3">
                   <p className="text-xs text-muted-foreground">
                     <span className="font-semibold text-foreground">{lessonCount}</span> lesson tersedia

@@ -1,3 +1,5 @@
+import { getContentAccess } from '@/lib/content-access';
+import { ContentLocked } from '@/components/learning/content-locked';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -63,7 +65,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const isAuthenticated = !!user;
 
   // 1. Fetch lesson catalog metadata
   const { data: catalogData, error: catalogError } = await supabase
@@ -92,7 +93,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const catConfig = CATEGORY_CONFIG[catalogLesson.category];
   const CategoryIcon = catConfig.icon;
   const lessonName = catalogLesson.title ?? `${catConfig.label} ${catalogLesson.number}`;
-  const isAccessible = isAuthenticated || catalogLesson.is_guest_accessible;
+  const access = await getContentAccess(catalogLesson.course_id, lessonId);
+  const isAccessible = access.allowed;
+  if (!isAccessible && user) return <Container size="lg" className="py-8 space-y-8"><PageHeader title={lessonName} /><ContentLocked access={access} /></Container>;
 
   let lessonStatus: LessonStatus = 'not_started';
   let progressError = false;

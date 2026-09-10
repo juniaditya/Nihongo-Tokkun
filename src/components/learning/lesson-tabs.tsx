@@ -13,6 +13,7 @@ type LessonCatalogRow = Database['public']['Views']['v_public_lesson_catalog']['
 interface LessonTabsProps {
   lessons: LessonCatalogRow[];
   isAuthenticated: boolean;
+  fullAccess?: boolean;
   statuses?: Record<string, LessonStatus>;
 }
 
@@ -42,7 +43,7 @@ const CATEGORY_CONFIG: Record<
   },
 };
 
-export function LessonTabs({ lessons, isAuthenticated, statuses }: LessonTabsProps) {
+export function LessonTabs({ lessons, isAuthenticated, fullAccess = isAuthenticated, statuses }: LessonTabsProps) {
   // Determine which categories actually have lessons
   const availableCategories = CATEGORIES.filter((cat) =>
     lessons.some((l) => l.category === cat)
@@ -116,7 +117,7 @@ export function LessonTabs({ lessons, isAuthenticated, statuses }: LessonTabsPro
           </p>
         ) : (
           filteredLessons.map((lesson) => {
-            const isAccessible = isAuthenticated || lesson.is_guest_accessible;
+            const isAccessible = fullAccess || lesson.is_guest_accessible;
             const lessonLabel =
               lesson.title ||
               `${CATEGORY_CONFIG[lesson.category].label} ${lesson.number}`;
@@ -171,19 +172,19 @@ export function LessonTabs({ lessons, isAuthenticated, statuses }: LessonTabsPro
         )}
 
         {/* Guest CTA when lessons are locked */}
-        {!isAuthenticated && filteredLessons.some((l) => !l.is_guest_accessible) && (
+        {!fullAccess && filteredLessons.some((l) => !l.is_guest_accessible) && (
           <div className="mt-4 rounded-xl border border-primary-500/20 bg-primary-500/5 p-4 text-center">
             <p className="text-sm font-medium text-foreground mb-1">
               Beberapa lesson dikunci
             </p>
             <p className="text-xs text-muted-foreground mb-3">
-              Daftar untuk membuka semua {filteredLessons.length} lesson.
+              Paket langganan diperlukan untuk membuka semua lesson.
             </p>
             <Link
-              href="/register"
+              href={isAuthenticated ? '/profile' : '/register'}
               className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-500 to-secondary-500 px-4 py-2 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             >
-              Daftar Gratis
+              {isAuthenticated ? 'Lihat Paket Saya' : 'Daftar Gratis'}
             </Link>
           </div>
         )}
