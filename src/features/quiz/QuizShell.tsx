@@ -13,6 +13,7 @@ import { AnswerFeedback } from './AnswerFeedback';
 import { ExitQuizDialog } from './ExitQuizDialog';
 import { QuizResult } from './QuizResult';
 import { SectionPicker } from './SectionPicker';
+import { TtsButton } from '@/components/TtsButton';
 
 type Phase = 'section_pick' | 'quiz_active' | 'exit_confirm' | 'quiz_done';
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
@@ -195,6 +196,7 @@ export function QuizShell({ session }: QuizShellProps) {
   }, [resetAttemptClock, skipPicker]);
 
   const currentPassage = currentQuestion?.passageSourceId != null ? session.passages[currentQuestion.passageSourceId] ?? null : null;
+  const questionTtsLocked = currentQuestion?.section === 'cara_baca' && selectedOption == null;
 
   function getOptionState(opt: QuizOption): 'idle' | 'selected-correct' | 'selected-wrong' | 'revealed-correct' {
     if (selectedOption == null) return 'idle';
@@ -225,6 +227,13 @@ export function QuizShell({ session }: QuizShellProps) {
             {currentPassage && <PassageDisplay passage={currentPassage} />}
             <section className="quiz-question-card" aria-label={`Soal ${questionIndex + 1} dari ${activeQuestions.length}`}>
               <QuestionPrompt questionNumber={questionIndex + 1} total={activeQuestions.length} prompt={currentQuestion.prompt} section={currentQuestion.section} />
+              <div className="quiz-tts-row">
+                <TtsButton
+                  text={currentQuestion.prompt}
+                  disabled={questionTtsLocked}
+                  label="Dengarkan soal"
+                />
+              </div>
               <div className="quiz-option-list" role="group" aria-labelledby="question-prompt">
                 {currentQuestion.options.map((opt) => (
                   <AnswerOption key={opt.id} option={opt} state={getOptionState(opt)} disabled={selectedOption != null} onSelect={handleSelect} />

@@ -3697,3 +3697,76 @@ body {
   .login-brand-mark { width: 44px; height: 44px; border-radius: 12px; font-size: 19px; }
   .login-brand h1 { font-size: 22px; }
 }
+
+/* ==========================================================
+   NEXT.JS PARITY V1.5 — TTS, safe Review Kotoba exit, centered cards
+   ========================================================== */
+.tts-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s, transform .15s;
+}
+.tts-action-button:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, var(--border));
+  background: var(--primary-bg);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+.tts-action-button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+.tts-action-button.is-speaking {
+  border-color: color-mix(in srgb, var(--primary) 70%, var(--border));
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+.tts-action-button-compact {
+  min-height: 32px;
+  padding: 5px 10px;
+  font-size: 11px;
+}
+.quiz-tts-row {
+  display: flex;
+  justify-content: flex-start;
+  margin: -6px 0 16px;
+}
+.flashcard-tts-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.flashcard-card.n2-flashcard-center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.flashcard-card.n2-flashcard-center .flashcard-back-content,
+.flashcard-card.n2-flashcard-center .fc-field,
+.flashcard-card.n2-flashcard-center .fc-field-label,
+.flashcard-card.n2-flashcard-center .fc-field-value {
+  text-align: center;
+}
+.flashcard-card.n2-flashcard-center .flashcard-back-content {
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .tts-action-button {
+    min-height: 38px;
+  }
+  .quiz-tts-row {
+    margin-bottom: 14px;
+  }
+}
