@@ -8,30 +8,38 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..', '..');
 const read = (path: string) => readFileSync(join(root, 'src', path), 'utf8');
 
-describe('v1.5 Japanese TTS', () => {
-  test('shared TTS control uses browser speech synthesis with ja-JP', () => {
+describe('v1.5.1 Japanese TTS behavior', () => {
+  test('shared TTS control uses browser speech synthesis with ja-JP, mute, and voice selection', () => {
     const source = read('components/TtsButton.tsx');
     assert.match(source, /speechSynthesis/);
     assert.match(source, /SpeechSynthesisUtterance/);
     assert.match(source, /ja-JP/);
+    assert.match(source, /nihongo-tokkun-tts-muted/);
+    assert.match(source, /nihongo-tokkun-tts-voice/);
+    assert.match(source, /Pilih suara TTS Jepang/);
+    assert.match(source, /Mute/);
   });
 
-  test('flashcards expose TTS without nesting it inside the card button', () => {
+  test('flashcard automatically speaks only when the back is shown', () => {
     const source = read('features/flashcards/FlashcardShell.tsx');
-    assert.match(source, /<TtsButton/);
-    assert.match(source, /flashcard-tts-row/);
+    assert.match(source, /autoPlay=\{flipped\}/);
+    assert.match(source, /ttsBackPlaySeq/);
+    assert.match(source, /autoPlayKey=\{flipped \? `\$\{card\.id\}:back:\$\{ttsBackPlaySeq\}` : null\}/);
+    assert.match(source, /showSettings/);
   });
 
-  test('quiz locks reading-question TTS until an answer is selected', () => {
+  test('quiz automatically speaks only after an answer and excludes Dokkai', () => {
     const source = read('features/quiz/QuizShell.tsx');
-    assert.match(source, /currentQuestion\?\.section === 'cara_baca' && selectedOption == null/);
-    assert.match(source, /disabled=\{questionTtsLocked\}/);
+    assert.match(source, /session\.lesson\.category === 'dokkai'.*DokkaiSession/);
+    assert.match(source, /quizTtsReady = selectedOption != null/);
+    assert.match(source, /autoPlay=\{quizTtsReady\}/);
+    assert.match(source, /disabled=\{!quizTtsReady\}/);
   });
 
-  test('Dokkai passage has a listen control', () => {
+  test('Dokkai passage has no TTS control', () => {
     const source = read('features/quiz/PassageDisplay.tsx');
-    assert.match(source, /Dengarkan bacaan/);
-    assert.match(source, /<TtsButton/);
+    assert.doesNotMatch(source, /TtsButton/);
+    assert.doesNotMatch(source, /Dengarkan bacaan/);
   });
 });
 

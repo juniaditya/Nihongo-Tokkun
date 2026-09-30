@@ -12,6 +12,7 @@ const WRONG_REASONS: Array<{ key: WrongReasonKey; label: string }> = [
 
 interface AnswerFeedbackProps {
   selectedOption: QuizOption;
+  correctOption: QuizOption | null;
   onNext: () => void;
   isLast: boolean;
   wrongReason: WrongReasonKey | '';
@@ -22,6 +23,7 @@ interface AnswerFeedbackProps {
 
 export function AnswerFeedback({
   selectedOption,
+  correctOption,
   onNext,
   isLast,
   wrongReason,
@@ -40,8 +42,18 @@ export function AnswerFeedback({
     >
       <p className="quiz-feedback-title">{isCorrect ? '✓ Benar!' : '✗ Salah'}</p>
 
-      {selectedOption.explanation && (
-        <p className="quiz-feedback-explanation" lang="ja">{selectedOption.explanation}</p>
+      {correctOption?.explanation && (
+        <div className="answer-explanation answer-explanation-correct">
+          <strong>✓ Kenapa “{correctOption.text}” benar</strong>
+          <p lang="ja">{correctOption.explanation}</p>
+        </div>
+      )}
+
+      {!isCorrect && selectedOption.explanation && (
+        <div className="answer-explanation answer-explanation-wrong">
+          <strong>✗ Kenapa “{selectedOption.text}” salah</strong>
+          <p lang="ja">{selectedOption.explanation}</p>
+        </div>
       )}
 
       {!isCorrect && (

@@ -1,5 +1,4 @@
 import type { QuizPassage } from "@/lib/quizTypes";
-import { TtsButton } from '@/components/TtsButton';
 
 interface PassageDisplayProps {
   passage: QuizPassage;
@@ -7,16 +6,12 @@ interface PassageDisplayProps {
 
 export function PassageDisplay({ passage }: PassageDisplayProps) {
   const isTwo = passage.passageType === "two";
-  const speechText = [passage.textA, passage.textB].filter(Boolean).join('。');
 
   return (
     <div className="mb-6 rounded-xl border border-violet-500/20 bg-violet-500/[0.04] p-5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs uppercase tracking-widest font-bold text-violet-400">
-          Teks Bacaan
-        </p>
-        <TtsButton text={speechText} label="Dengarkan bacaan" className="tts-action-button-compact" />
-      </div>
+      <p className="text-xs uppercase tracking-widest font-bold text-violet-400 mb-3">
+        Teks Bacaan
+      </p>
 
       {isTwo ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

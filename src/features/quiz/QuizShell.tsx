@@ -13,7 +13,9 @@ import { AnswerFeedback } from './AnswerFeedback';
 import { ExitQuizDialog } from './ExitQuizDialog';
 import { QuizResult } from './QuizResult';
 import { SectionPicker } from './SectionPicker';
+import { DokkaiSession } from './DokkaiSession';
 import { TtsButton } from '@/components/TtsButton';
+import { NewMaterialPanel } from '@/components/NewMaterialPanel';
 
 type Phase = 'section_pick' | 'quiz_active' | 'exit_confirm' | 'quiz_done';
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
@@ -38,6 +40,11 @@ function makeClientKey() {
 }
 
 export function QuizShell({ session }: QuizShellProps) {
+  if (session.lesson.category === 'dokkai') return <DokkaiSession session={session} />;
+  return <StandardQuizSession session={session} />;
+}
+
+function StandardQuizSession({ session }: QuizShellProps) {
   const router = useRouter();
   const skipPicker = session.mode === 'mixed' || session.lesson.category === 'dokkai' || session.section != null || session.availableSections.length <= 1;
   const [phase, setPhase] = useState<Phase>(skipPicker ? 'quiz_active' : 'section_pick');
@@ -196,7 +203,8 @@ export function QuizShell({ session }: QuizShellProps) {
   }, [resetAttemptClock, skipPicker]);
 
   const currentPassage = currentQuestion?.passageSourceId != null ? session.passages[currentQuestion.passageSourceId] ?? null : null;
-  const questionTtsLocked = currentQuestion?.section === 'cara_baca' && selectedOption == null;
+  const quizTtsReady = selectedOption != null;
+  const correctOption = currentQuestion?.options.find((option) => option.isCorrect) ?? null;
 
   function getOptionState(opt: QuizOption): 'idle' | 'selected-correct' | 'selected-wrong' | 'revealed-correct' {
     if (selectedOption == null) return 'idle';
@@ -225,15 +233,19 @@ export function QuizShell({ session }: QuizShellProps) {
           <>
             <QuizProgress current={questionIndex + 1} total={activeQuestions.length} correct={correct} />
             {currentPassage && <PassageDisplay passage={currentPassage} />}
+            <div className="quiz-tts-toolbar">
+              <TtsButton
+                text={currentQuestion.prompt}
+                disabled={!quizTtsReady}
+                label="Dengarkan soal"
+                autoPlay={quizTtsReady}
+                autoPlayKey={quizTtsReady ? `${currentQuestion.id}:${selectedOption?.id ?? 'answered'}` : null}
+                showSettings
+              />
+            </div>
+            {session.mode === 'mixed' && <NewMaterialPanel />}
             <section className="quiz-question-card" aria-label={`Soal ${questionIndex + 1} dari ${activeQuestions.length}`}>
               <QuestionPrompt questionNumber={questionIndex + 1} total={activeQuestions.length} prompt={currentQuestion.prompt} section={currentQuestion.section} />
-              <div className="quiz-tts-row">
-                <TtsButton
-                  text={currentQuestion.prompt}
-                  disabled={questionTtsLocked}
-                  label="Dengarkan soal"
-                />
-              </div>
               <div className="quiz-option-list" role="group" aria-labelledby="question-prompt">
                 {currentQuestion.options.map((opt) => (
                   <AnswerOption key={opt.id} option={opt} state={getOptionState(opt)} disabled={selectedOption != null} onSelect={handleSelect} />
@@ -242,6 +254,7 @@ export function QuizShell({ session }: QuizShellProps) {
               {selectedOption != null && (
                 <AnswerFeedback
                   selectedOption={selectedOption}
+                  correctOption={correctOption}
                   onNext={handleNext}
                   isLast={isLast}
                   wrongReason={wrongReason}

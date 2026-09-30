@@ -259,7 +259,7 @@ export interface FlashcardSessionCard {
   meaning: string;
   detailExplanation: string | null;
   backFields: Array<{ label: string; value: string }>;
-  sourceType: 'course_kotoba' | 'user_kotoba';
+  sourceType: 'course_kotoba' | 'user_kotoba' | 'user_bunpou';
   sourceKategori: string;
   sourceNomor: number;
   sourceBagian: string;
@@ -270,12 +270,20 @@ export interface FlashcardSessionData {
   mode: 'lesson' | 'review';
   lesson: {
     id: string | null;
-    category: 'kotoba' | 'bunpou' | 'review_kotoba';
+    category: 'kotoba' | 'bunpou' | 'review_kotoba' | 'kotoba_tambahan' | 'bunpou_tambahan';
     lessonNumber: number;
     label: string;
   };
   cards: FlashcardSessionCard[];
   nextDueAt?: string | null;
+}
+
+
+export interface UserMaterialSummary {
+  kotobaTotal: number;
+  kotobaNew: number;
+  kotobaInFsrs: number;
+  bunpouTotal: number;
 }
 
 export interface LessonProgressItem {

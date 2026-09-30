@@ -1,5 +1,6 @@
 import { getLessons } from "@/server/supabase/content";
 import { getLearningSummary, getReviewQueueSummary } from "@/server/supabase/learning";
+import { getUserMaterialSummary } from "@/server/supabase/flashcards";
 import { sortLessons } from "@/lib/lessonSort";
 import { AlertCircle } from "lucide-react";
 import CourseClientWrapper from "./CourseClientWrapper";
@@ -12,12 +13,13 @@ export const metadata = {
 
 export default async function CoursesPage() {
   try {
-    const [rawLessons, learning, reviewQueue] = await Promise.all([
+    const [rawLessons, learning, reviewQueue, userMaterials] = await Promise.all([
       getLessons(),
       getLearningSummary(),
       getReviewQueueSummary(),
+      getUserMaterialSummary(),
     ]);
-    return <CourseClientWrapper lessons={sortLessons(rawLessons)} learning={learning} reviewQueue={reviewQueue} />;
+    return <CourseClientWrapper lessons={sortLessons(rawLessons)} learning={learning} reviewQueue={reviewQueue} userMaterials={userMaterials} />;
   } catch (e) {
     const error = e instanceof Error ? e.message : "Unknown error loading lessons.";
     return (

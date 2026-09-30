@@ -44,6 +44,7 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
   const [saveMessage, setSaveMessage] = useState('');
   const [serverScore, setServerScore] = useState<number | null>(null);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const [ttsBackPlaySeq, setTtsBackPlaySeq] = useState(0);
   const [pendingExitHref, setPendingExitHref] = useState('/courses');
   const startedAtRef = useRef(new Date().toISOString());
   const startedAtMsRef = useRef(Date.now());
@@ -68,7 +69,7 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
       durationMs: Math.max(0, Date.now() - startedAtMsRef.current),
       kategori: session.lesson.category,
       nomor: session.lesson.lessonNumber,
-      bagian: session.mode === 'review' ? 'flashcard' : 'latihan',
+      bagian: session.mode === 'review' || session.lesson.category === 'kotoba_tambahan' || session.lesson.category === 'bunpou_tambahan' ? 'flashcard' : 'latihan',
       reviews: finalReviews,
     };
     setSaveState('saving');
@@ -134,6 +135,15 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
     window.location.assign(pendingExitHref);
   }, [finish, pendingExitHref, reviews]);
 
+  const toggleCard = useCallback(() => {
+    if (flipped) {
+      setFlipped(false);
+      return;
+    }
+    setFlipped(true);
+    setTtsBackPlaySeq((value) => value + 1);
+  }, [flipped]);
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
@@ -141,7 +151,7 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
       const key = event.key.toLowerCase();
       if (!done && (key === 's' || key === 'o' || event.key === ' ' || event.key === 'ArrowDown')) {
         event.preventDefault();
-        setFlipped((value) => !value);
+        toggleCard();
       } else if (!done && flipped && (key === 'a' || key === 'j' || key === 'i' || event.key === 'ArrowLeft')) {
         event.preventDefault();
         grade('Again');
@@ -152,7 +162,7 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [done, flipped, grade]);
+  }, [done, flipped, grade, toggleCard]);
 
   useEffect(() => {
     if (!hasUnsavedReviewProgress) return;
@@ -187,13 +197,24 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
       <div className="panel fade-in result-panel">
         <div className="crumbs">{session.lesson.label}</div>
         <div className="result-stamp">0</div>
-        <h2>Tidak ada kartu yang perlu direview.</h2>
+        <h2>{session.lesson.category === 'kotoba_tambahan'
+          ? 'Tidak ada Kotoba Tambahan baru.'
+          : session.lesson.category === 'bunpou_tambahan'
+          ? 'Belum ada Bunpou Tambahan.'
+          : 'Tidak ada kartu yang perlu direview.'}</h2>
         <p className="result-sub">
-          {formatNextDue(session.nextDueAt)
+          {session.lesson.category === 'kotoba_tambahan'
+            ? 'Kotoba yang sudah diberi rating pertama otomatis masuk ke antrean FSRS Review Kotoba.'
+            : session.lesson.category === 'bunpou_tambahan'
+            ? 'Tambahkan bunpou dari tombol Catat Kotoba / Bunpou saat Latihan Campuran atau Dokkai.'
+            : formatNextDue(session.nextDueAt)
             ? `Review berikutnya: ${formatNextDue(session.nextDueAt)} WITA`
             : 'Belum ada kartu terjadwal.'}
         </p>
-        <div className="action-row"><Link className="btn-primary" href="/courses">Kembali ke Kursus</Link></div>
+        <div className="action-row">
+          {session.lesson.category === 'kotoba_tambahan' && <Link className="btn-primary" href="/review">Buka Review Kotoba</Link>}
+          <Link className="btn-ghost" href="/courses">Kembali ke Kursus</Link>
+        </div>
       </div>
     );
   }
@@ -244,11 +265,21 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
           <span className="progress-label">{index + 1} / {total}</span>
         </div>
 
+        <div className="flashcard-tts-toolbar">
+          <TtsButton
+            text={speechText}
+            label={flipped && card.reading ? 'Dengarkan cara baca' : 'Dengarkan'}
+            autoPlay={flipped}
+            autoPlayKey={flipped ? `${card.id}:back:${ttsBackPlaySeq}` : null}
+            showSettings
+          />
+        </div>
+
         <div className="flashcard-wrap">
           <button
             type="button"
             className={`flashcard-card n2-flashcard-center ${flipped ? 'grid-layout' : ''}`}
-            onClick={() => setFlipped((value) => !value)}
+            onClick={toggleCard}
             aria-label={flipped ? 'Tampilkan soal' : 'Tampilkan jawaban'}
           >
             {!flipped ? (
@@ -271,9 +302,6 @@ export function FlashcardShell({ session }: { session: FlashcardSessionData }) {
             )}
           </button>
 
-          <div className="flashcard-tts-row">
-            <TtsButton text={speechText} label={flipped && card.reading ? 'Dengarkan cara baca' : 'Dengarkan'} />
-          </div>
 
           {flipped ? (
             <>

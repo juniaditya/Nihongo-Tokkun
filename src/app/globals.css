@@ -3770,3 +3770,371 @@ body {
     margin-bottom: 14px;
   }
 }
+
+
+/* ==========================================================
+   NEXT.JS PARITY V1.5.1 — autoplay TTS + mute + voice picker
+   ========================================================== */
+.tts-control-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+.tts-mute-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tts-mute-button:hover,
+.tts-mute-button.is-muted {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  color: var(--primary);
+  background: var(--primary-bg);
+}
+.tts-voice-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 4px 7px 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-soft);
+}
+.tts-voice-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.tts-voice-select {
+  max-width: min(260px, 55vw);
+  min-height: 28px;
+  padding: 3px 26px 3px 7px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11.5px;
+}
+.tts-voice-select:focus-visible,
+.tts-mute-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .tts-control-cluster { align-items: stretch; }
+  .tts-action-button,
+  .tts-mute-button,
+  .tts-voice-control { flex: 1 1 auto; }
+  .tts-voice-control { justify-content: space-between; }
+  .tts-voice-select { max-width: 62vw; }
+}
+
+/* ==========================================================
+   V1.6 — TTS placement, personal materials, grouped Dokkai
+   ========================================================== */
+.flashcard-tts-toolbar,
+.quiz-tts-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 14px;
+}
+
+.flashcard-tts-toolbar .tts-control-cluster,
+.quiz-tts-toolbar .tts-control-cluster {
+  width: min(100%, 760px);
+  justify-content: center;
+}
+
+.quiz-answer-selected {
+  border-color: color-mix(in srgb, var(--primary) 72%, var(--border));
+  background: var(--primary-bg);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.answer-explanation {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.answer-explanation strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.answer-explanation p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.answer-explanation-correct {
+  border-color: color-mix(in srgb, var(--success) 38%, var(--border));
+  background: color-mix(in srgb, var(--success-bg) 72%, var(--surface-2));
+}
+.answer-explanation-wrong {
+  border-color: color-mix(in srgb, var(--danger) 38%, var(--border));
+  background: color-mix(in srgb, var(--danger-bg) 72%, var(--surface-2));
+}
+
+.new-material-shell {
+  width: 100%;
+  margin: 10px 0 16px;
+}
+.new-material-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.new-material-toggle:hover {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+}
+.new-material-panel {
+  margin-top: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+.new-material-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.new-material-head strong { color: var(--ink); }
+.new-material-head p {
+  margin: 4px 0 0;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+.material-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  flex: 0 0 auto;
+}
+.material-tabs button {
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-muted);
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.material-tabs button.active {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+.material-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+.material-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.material-form-grid input,
+.material-form-grid textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+.material-form-grid input:focus,
+.material-form-grid textarea:focus {
+  outline: 2px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  border-color: var(--primary);
+}
+.material-form-wide { grid-column: 1 / -1; }
+.new-material-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 13px;
+  flex-wrap: wrap;
+}
+.new-material-status {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.new-material-status.saved { color: var(--success); }
+.new-material-status.error { color: var(--danger); }
+
+.personal-material-review-card { margin-top: 14px; }
+.personal-material-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.personal-material-review-item {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.personal-material-review-item strong { color: var(--ink); font-size: 13px; }
+.personal-material-review-item p {
+  margin: 4px 0 0;
+  color: var(--ink-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.personal-material-review-item .btn-primary,
+.personal-material-review-item .btn-ghost { flex: 0 0 auto; }
+
+.dokkai-grouped-shell { max-width: 980px; margin: 0 auto; }
+.dokkai-section-progress { margin: 12px 0 14px; }
+.dokkai-section-progress > p {
+  margin: 8px 0 0;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.dokkai-section-tabs {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.dokkai-section-tabs span {
+  flex: 0 0 auto;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--ink-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.dokkai-section-tabs span.active {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  background: var(--primary-bg);
+}
+.dokkai-section-tabs span.done { color: var(--success); }
+.dokkai-question-stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+.dokkai-question-card {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 1px);
+  background: var(--surface-1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+.dokkai-question-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 14px;
+}
+.dokkai-question-number {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+.dokkai-question-heading p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.7;
+}
+.dokkai-inline-feedback {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.dokkai-section-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.dokkai-section-actions .muted { margin: 0; font-size: 11.5px; }
+
+@media (max-width: 720px) {
+  .flashcard-tts-toolbar,
+  .quiz-tts-toolbar { justify-content: stretch; }
+  .flashcard-tts-toolbar .tts-control-cluster,
+  .quiz-tts-toolbar .tts-control-cluster { width: 100%; }
+  .new-material-head { flex-direction: column; }
+  .material-form-grid { grid-template-columns: 1fr; }
+  .material-form-wide { grid-column: auto; }
+  .personal-material-review-grid { grid-template-columns: 1fr; }
+  .personal-material-review-item { align-items: flex-start; flex-direction: column; }
+  .personal-material-review-item .btn-primary,
+  .personal-material-review-item .btn-ghost { width: 100%; justify-content: center; }
+  .dokkai-question-card { padding: 14px; }
+}

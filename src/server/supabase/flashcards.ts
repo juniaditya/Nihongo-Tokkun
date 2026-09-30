@@ -2,9 +2,7 @@ import 'server-only';
 
 import { getSupabaseClient } from './client';
 import { getRuntimeUsername } from '@/server/runtimeUser';
-import type { LearningCategory } from '@/lib/types';
-
-import type { FlashcardSessionCard, FlashcardSessionData } from '@/lib/types';
+import type { LearningCategory, FlashcardSessionCard, FlashcardSessionData, UserMaterialSummary } from '@/lib/types';
 
 function asObject(value: unknown): Record<string, string> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
@@ -81,6 +79,7 @@ export async function getFlashcardSessionForLesson(lessonId: string): Promise<Fl
       meaning: back.arti ?? back.fungsi ?? '',
       detailExplanation: back.penjelasan ?? back.contohKalimat ?? null,
       backFields,
+      // Existing DTO uses the source type only for FSRS-enabled Kotoba paths.
       sourceType: 'course_kotoba',
       sourceKategori: category,
       sourceNomor: Number(lesson.lesson_number) || 1,
@@ -95,6 +94,137 @@ export async function getFlashcardSessionForLesson(lessonId: string): Promise<Fl
       category,
       lessonNumber: Number(lesson.lesson_number) || 1,
       label: String(lesson.label ?? `${category} ${lesson.lesson_number}`),
+    },
+    cards: shuffle(cards),
+  };
+}
+
+export async function getUserMaterialSummary(): Promise<UserMaterialSummary> {
+  const sb = getSupabaseClient();
+  const username = await getRuntimeUsername();
+
+  const [kotobaResult, bunpouResult, stateResult] = await Promise.all([
+    sb.from('user_kotoba').select('card_id').eq('username', username),
+    sb.from('user_bunpou').select('card_id').eq('username', username),
+    sb.from('user_card_state').select('card_id').eq('username', username).eq('source_type', 'user_kotoba'),
+  ]);
+
+  if (kotobaResult.error) throw new Error(`[getUserMaterialSummary:kotoba] ${kotobaResult.error.message}`);
+  if (bunpouResult.error) throw new Error(`[getUserMaterialSummary:bunpou] ${bunpouResult.error.message}`);
+  if (stateResult.error) throw new Error(`[getUserMaterialSummary:state] ${stateResult.error.message}`);
+
+  const kotobaIds = new Set((kotobaResult.data ?? []).map((row) => String(row.card_id)));
+  const fsrsIds = new Set((stateResult.data ?? []).map((row) => String(row.card_id)).filter((id) => kotobaIds.has(id)));
+
+  return {
+    kotobaTotal: kotobaIds.size,
+    kotobaNew: Math.max(0, kotobaIds.size - fsrsIds.size),
+    kotobaInFsrs: fsrsIds.size,
+    bunpouTotal: (bunpouResult.data ?? []).length,
+  };
+}
+
+/**
+ * Personal Kotoba has a deliberate two-stage flow:
+ * 1) newly saved cards appear here exactly until they receive their first rating;
+ * 2) that first rating creates the FSRS state, after which the card belongs to Review Kotoba.
+ * This prevents off-schedule re-grading from the "Kotoba Tambahan" entry point.
+ */
+export async function getUserKotobaStudySession(): Promise<FlashcardSessionData> {
+  const sb = getSupabaseClient();
+  const username = await getRuntimeUsername();
+
+  const [cardsResult, stateResult] = await Promise.all([
+    sb
+      .from('user_kotoba')
+      .select('card_id, kotoba, cara_baca, arti, penjelasan, created_at')
+      .eq('username', username)
+      .order('created_at', { ascending: true }),
+    sb
+      .from('user_card_state')
+      .select('card_id')
+      .eq('username', username)
+      .eq('source_type', 'user_kotoba'),
+  ]);
+
+  if (cardsResult.error) throw new Error(`[getUserKotobaStudySession:cards] ${cardsResult.error.message}`);
+  if (stateResult.error) throw new Error(`[getUserKotobaStudySession:state] ${stateResult.error.message}`);
+
+  const alreadyInFsrs = new Set((stateResult.data ?? []).map((row) => String(row.card_id)));
+  const cards: FlashcardSessionCard[] = (cardsResult.data ?? [])
+    .filter((row) => !alreadyInFsrs.has(String(row.card_id)))
+    .map((row) => {
+      const cardId = String(row.card_id);
+      const back = {
+        hiragana: String(row.cara_baca ?? ''),
+        arti: String(row.arti ?? ''),
+        penjelasan: String(row.penjelasan ?? ''),
+      };
+      return {
+        id: cardId,
+        front: String(row.kotoba ?? ''),
+        reading: back.hiragana || null,
+        meaning: back.arti,
+        detailExplanation: back.penjelasan || null,
+        backFields: kotobaBackFields(back),
+        sourceType: 'user_kotoba',
+        sourceKategori: 'kotoba_tambahan',
+        sourceNomor: 1,
+        sourceBagian: 'flashcard',
+      };
+    });
+
+  return {
+    mode: 'lesson',
+    lesson: {
+      id: null,
+      category: 'kotoba_tambahan',
+      lessonNumber: 1,
+      label: 'Kotoba Tambahan',
+    },
+    cards: shuffle(cards),
+  };
+}
+
+export async function getUserBunpouStudySession(): Promise<FlashcardSessionData> {
+  const sb = getSupabaseClient();
+  const username = await getRuntimeUsername();
+  const { data, error } = await sb
+    .from('user_bunpou')
+    .select('card_id, bunpou, bahasa_indonesia, fungsi, perbedaan_kunci, rumus, contoh_kalimat, created_at')
+    .eq('username', username)
+    .order('created_at', { ascending: true });
+  if (error) throw new Error(`[getUserBunpouStudySession] ${error.message}`);
+
+  const cards: FlashcardSessionCard[] = (data ?? []).map((row) => {
+    const back = {
+      arti: String(row.bahasa_indonesia ?? ''),
+      fungsi: String(row.fungsi ?? ''),
+      perbedaanKunci: String(row.perbedaan_kunci ?? ''),
+      rumus: String(row.rumus ?? ''),
+      contohKalimat: String(row.contoh_kalimat ?? ''),
+    };
+    return {
+      id: String(row.card_id),
+      front: String(row.bunpou ?? ''),
+      reading: null,
+      meaning: back.arti || back.fungsi,
+      detailExplanation: back.contohKalimat || null,
+      backFields: bunpouBackFields(back),
+      sourceType: 'user_bunpou',
+      sourceKategori: 'bunpou_tambahan',
+      sourceNomor: 1,
+      sourceBagian: 'flashcard',
+    };
+  });
+
+  return {
+    mode: 'lesson',
+    lesson: {
+      id: null,
+      category: 'bunpou_tambahan',
+      lessonNumber: 1,
+      label: 'Bunpou Tambahan',
     },
     cards: shuffle(cards),
   };

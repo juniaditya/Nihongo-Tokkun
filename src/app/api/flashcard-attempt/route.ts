@@ -1,7 +1,7 @@
-import { getSupabaseClient } from "@/server/supabase/client";
-import { getRuntimeUsername } from "@/server/runtimeUser";
-import { applyFsrsReview, type FsrsStateInput } from "@/lib/fsrs";
-import type { FlashAttemptSubmission } from "@/lib/runtimeDtos";
+import { getSupabaseClient } from '@/server/supabase/client';
+import { getRuntimeUsername } from '@/server/runtimeUser';
+import { applyFsrsReview, type FsrsStateInput } from '@/lib/fsrs';
+import type { FlashAttemptSubmission } from '@/lib/runtimeDtos';
 
 function writesEnabled() {
   return String(process.env.ENABLE_PERSONAL_WRITES || '').toLowerCase() === 'true';
@@ -30,6 +30,22 @@ function toPrevious(row: Record<string, unknown>): FsrsStateInput {
   };
 }
 
+async function validateOwnedUserCards(
+  sb: ReturnType<typeof getSupabaseClient>,
+  username: string,
+  table: 'user_kotoba' | 'user_bunpou',
+  cardIds: string[],
+) {
+  const { data, error } = await sb
+    .from(table)
+    .select('card_id')
+    .eq('username', username)
+    .in('card_id', cardIds);
+  if (error) throw new Error(error.message);
+  const validIds = new Set((data ?? []).map((row) => String(row.card_id)));
+  return validIds.size === cardIds.length && cardIds.every((id) => validIds.has(id));
+}
+
 export async function POST(request: Request) {
   if (!writesEnabled()) {
     return Response.json({ ok: false, error: 'WRITE_DISABLED', message: 'Set ENABLE_PERSONAL_WRITES=true only for a protected personal deployment.' }, { status: 503 });
@@ -37,7 +53,7 @@ export async function POST(request: Request) {
   try {
     const payload = await request.json() as FlashAttemptSubmission;
     const username = await getRuntimeUsername();
-    const categories = new Set(['kotoba', 'bunpou', 'review_kotoba']);
+    const categories = new Set(['kotoba', 'bunpou', 'review_kotoba', 'kotoba_tambahan', 'bunpou_tambahan']);
     if (!payload?.clientAttemptKey || !Array.isArray(payload.reviews) || payload.reviews.length === 0 || !categories.has(String(payload.kategori)) || Number(payload.nomor) < 1) {
       return Response.json({ ok: false, error: 'INVALID_PAYLOAD' }, { status: 400 });
     }
@@ -55,7 +71,7 @@ export async function POST(request: Request) {
     const sb = getSupabaseClient();
 
     // Ownership/content validation is server-side. Never trust client-provided
-    // source metadata for official course cards or Review Kotoba.
+    // source metadata for official or personal cards.
     if (payload.kategori === 'kotoba' || payload.kategori === 'bunpou') {
       const { data: validCards, error: validErr } = await sb
         .from('flashcards')
@@ -68,6 +84,16 @@ export async function POST(request: Request) {
       if (validIds.size !== cardIds.length || cardIds.some((id) => !validIds.has(id))) {
         return Response.json({ ok: false, error: 'CARD_NOT_IN_LESSON' }, { status: 400 });
       }
+    }
+
+    if (payload.kategori === 'kotoba_tambahan') {
+      const owned = await validateOwnedUserCards(sb, username, 'user_kotoba', cardIds);
+      if (!owned) return Response.json({ ok: false, error: 'USER_KOTOBA_NOT_OWNED' }, { status: 403 });
+    }
+
+    if (payload.kategori === 'bunpou_tambahan') {
+      const owned = await validateOwnedUserCards(sb, username, 'user_bunpou', cardIds);
+      if (!owned) return Response.json({ ok: false, error: 'USER_BUNPOU_NOT_OWNED' }, { status: 403 });
     }
 
     const attemptId = `att-${crypto.randomUUID().replace(/-/g, '').slice(0, 8)}`;
@@ -93,7 +119,7 @@ export async function POST(request: Request) {
       reviewed_at: r.reviewedAt,
     }));
 
-    const isFsrsEligible = payload.kategori === 'kotoba' || payload.kategori === 'review_kotoba';
+    const isFsrsEligible = payload.kategori === 'kotoba' || payload.kategori === 'kotoba_tambahan' || payload.kategori === 'review_kotoba';
     if (isFsrsEligible) {
       const { data: stateRows, error: stateErr } = await sb
         .from('user_card_state')
@@ -110,18 +136,20 @@ export async function POST(request: Request) {
 
       const pCardStates = payload.reviews.map((review) => {
         const previous = existing.get(review.cardId) ?? null;
-        const sourceType = payload.kategori === 'review_kotoba'
+        const isReview = payload.kategori === 'review_kotoba';
+        const isUserKotoba = payload.kategori === 'kotoba_tambahan';
+        const sourceType: FsrsStateInput['sourceType'] = isReview
           ? previous!.sourceType
+          : isUserKotoba
+          ? 'user_kotoba'
           : 'course_kotoba';
-        const sourceKategori = payload.kategori === 'review_kotoba'
+        const sourceKategori = isReview
           ? previous!.sourceKategori
+          : isUserKotoba
+          ? 'kotoba_tambahan'
           : 'kotoba';
-        const sourceNomor = payload.kategori === 'review_kotoba'
-          ? previous!.sourceNomor
-          : Number(payload.nomor) || 1;
-        const sourceBagian = payload.kategori === 'review_kotoba'
-          ? previous!.sourceBagian
-          : payload.bagian || 'latihan';
+        const sourceNomor = isReview ? previous!.sourceNomor : Number(payload.nomor) || 1;
+        const sourceBagian = isReview ? previous!.sourceBagian : isUserKotoba ? 'flashcard' : payload.bagian || 'latihan';
         const next = applyFsrsReview(previous, {
           cardId: review.cardId,
           result: review.result,
@@ -162,8 +190,8 @@ export async function POST(request: Request) {
       return Response.json(data ?? { ok: true, attemptId, totalKartu: payload.reviews.length, good, again, skor: pAttempt.skor });
     }
 
-    // Bunpou flashcards are tracked as attempts/history but do not participate in
-    // the current course_kotoba FSRS state machine.
+    // Bunpou official/personal flashcards are tracked as attempts/history but do
+    // not participate in the current Kotoba FSRS state machine.
     const { data: existingAttempt, error: existingErr } = await sb
       .from('flashcard_attempts')
       .select('attempt_id, total_kartu, good, again, skor')

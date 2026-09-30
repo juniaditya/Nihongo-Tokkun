@@ -2,13 +2,14 @@ import type { QuizOption } from '@/lib/quizTypes';
 
 interface AnswerOptionProps {
   option: QuizOption;
-  state: 'idle' | 'selected-correct' | 'selected-wrong' | 'revealed-correct';
+  state: 'idle' | 'selected' | 'selected-correct' | 'selected-wrong' | 'revealed-correct';
   disabled: boolean;
   onSelect: (option: QuizOption) => void;
 }
 
 const stateIcon: Record<AnswerOptionProps['state'], string> = {
   idle: '',
+  selected: '',
   'selected-correct': '✓',
   'selected-wrong': '✗',
   'revealed-correct': '✓',

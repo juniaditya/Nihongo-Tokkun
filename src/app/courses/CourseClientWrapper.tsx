@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { BookOpenCheck, Dice5, Layers3, LockKeyhole, RotateCcw, Languages, Mic, Info, Link2, Split, MessageSquare } from "lucide-react";
-import type { LearningSummary, LessonSummary, ReviewQueueSummary } from "@/lib/types";
+import type { LearningSummary, LessonSummary, ReviewQueueSummary, UserMaterialSummary } from "@/lib/types";
 
 type Tab = "semua" | "kotoba" | "bunpou" | "dokkai";
 
@@ -87,10 +87,12 @@ export default function CourseClientWrapper({
   lessons,
   learning,
   reviewQueue,
+  userMaterials,
 }: {
   lessons: LessonSummary[];
   learning: LearningSummary;
   reviewQueue: ReviewQueueSummary;
+  userMaterials: UserMaterialSummary;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("semua");
   const filtered = activeTab === "semua" ? lessons : lessons.filter((l) => l.category === activeTab);
@@ -113,6 +115,29 @@ export default function CourseClientWrapper({
         ) : (
           <button className="btn-primary" disabled>Mulai Review</button>
         )}
+      </div>
+
+      <div className="chart-card personal-material-review-card">
+        <div className="review-course-head">
+          <h3><Layers3 size={17} /> Materi Tambahan Pribadi</h3>
+          <p className="muted">Kotoba dan bunpou yang kamu simpan saat Latihan Campuran atau Dokkai hanya tersedia untuk akunmu.</p>
+        </div>
+        <div className="personal-material-review-grid">
+          <div className="personal-material-review-item">
+            <div>
+              <strong>Kotoba Tambahan</strong>
+              <p>{userMaterials.kotobaNew} baru · {userMaterials.kotobaInFsrs} sudah masuk FSRS · {userMaterials.kotobaTotal} total</p>
+            </div>
+            <Link className="btn-primary" href="/review/kotoba-tambahan">Pelajari Kotoba Baru</Link>
+          </div>
+          <div className="personal-material-review-item">
+            <div>
+              <strong>Bunpou Tambahan</strong>
+              <p>{userMaterials.bunpouTotal} kartu pribadi · review manual, terpisah dari FSRS Kotoba</p>
+            </div>
+            <Link className="btn-ghost" href="/review/bunpou-tambahan">Review Bunpou</Link>
+          </div>
+        </div>
       </div>
 
       <div className="course-header-row">

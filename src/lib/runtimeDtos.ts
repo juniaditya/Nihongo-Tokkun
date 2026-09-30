@@ -26,7 +26,7 @@ export interface FlashReviewSubmission {
   result: 'Good' | 'Again';
   responseTimeMs: number;
   reviewedAt: string;
-  sourceType?: 'course_kotoba' | 'user_kotoba';
+  sourceType?: 'course_kotoba' | 'user_kotoba' | 'user_bunpou';
   sourceKategori?: string;
   sourceNomor?: number;
   sourceBagian?: string;
@@ -37,7 +37,7 @@ export interface FlashAttemptSubmission {
   startedAt: string;
   completedAt: string;
   durationMs: number;
-  kategori: 'kotoba' | 'bunpou' | 'review_kotoba';
+  kategori: 'kotoba' | 'bunpou' | 'review_kotoba' | 'kotoba_tambahan' | 'bunpou_tambahan';
   nomor: number;
   bagian: string;
   reviews: FlashReviewSubmission[];
